@@ -229,6 +229,32 @@
       .author { flex-direction: column; text-align: center; }
     }
 
+    /* ===== MANIFESTO DO OPERADOR ===== */
+    .manifesto-box {
+      border-left: 4px solid var(--acc);
+      background: var(--acc-soft);
+      padding: 1.8rem 2rem;
+      margin: 2rem 0 2.6rem;
+      max-width: 740px;
+    }
+    .manifesto-box p {
+      font: 800 1.4rem/1.3 var(--disp);
+      letter-spacing: -.01em;
+      color: var(--ink);
+    }
+    .manifesto-box p em {
+      font-style: normal;
+      color: var(--acc);
+    }
+    .manifesto-box .sig {
+      display: block;
+      margin-top: 0.8rem;
+      font: 500 12px var(--mono);
+      color: var(--dim2);
+      text-transform: uppercase;
+      letter-spacing: .2em;
+    }
+
     /* ===== STATEMENT ===== */
     .statement { padding: 9rem 6vw; text-align: center; }
     .statement blockquote {
@@ -311,6 +337,29 @@
     .ch-num { font: 500 12px var(--mono); color: var(--dim2); padding-top: .25rem; }
     .ch h4 { font: 600 1.05rem var(--body); margin-bottom: .4rem; }
     .ch p { font-size: .85rem; color: var(--dim); margin-bottom: .7rem; }
+    .ch-meta {
+      display: flex; flex-wrap: wrap; gap: 0.8rem 1.2rem;
+      font: 500 11px var(--mono); color: var(--dim2);
+      margin: 0.4rem 0 0.8rem;
+    }
+    .ch-meta span::before {
+      content: "◆ ";
+      color: var(--acc);
+      font-size: 8px;
+      vertical-align: middle;
+      margin-right: 4px;
+    }
+    .ch-prod {
+      display: inline-block;
+      font: 600 9px var(--mono);
+      letter-spacing: .06em;
+      text-transform: uppercase;
+      color: var(--ok);
+      background: rgba(95,208,104,.12);
+      padding: .15rem .6rem;
+      border-radius: 12px;
+      margin-top: 0.2rem;
+    }
     .ch-out {
       font: 500 11px var(--mono); color: var(--acc);
       border: 1px solid rgba(255,178,36,.3); padding: .3rem .7rem; display: inline-block;
@@ -333,6 +382,51 @@
     @media (max-width: 640px) {
       .ch { grid-template-columns: 1fr; }
       .ch-num, .ch-tag { display: none; }
+    }
+
+    /* ===== PAINEL TEMPLATES ===== */
+    .template-grid {
+      display: grid; grid-template-columns: repeat(auto-fill, minmax(240px, 1fr));
+      gap: 16px; margin-top: 2.6rem;
+    }
+    .template-card {
+      border: 1px solid var(--line2);
+      padding: 1.8rem 1.4rem;
+      background: rgba(255,178,36,.03);
+      transition: border-color .3s;
+    }
+    .template-card:hover { border-color: var(--acc); }
+    .template-card h4 {
+      font: 700 1rem var(--body);
+      color: var(--acc);
+      margin-bottom: 0.4rem;
+    }
+    .template-card .spec {
+      font: 500 11px var(--mono);
+      color: var(--dim2);
+      margin-bottom: 0.6rem;
+    }
+    .template-card .spec strong { color: var(--ink); }
+    .template-card ul {
+      list-style: none;
+      font-size: .8rem;
+      color: var(--dim);
+      display: flex;
+      flex-direction: column;
+      gap: .4rem;
+      margin-top: .6rem;
+    }
+    .template-card ul li::before {
+      content: "▹ ";
+      color: var(--acc);
+    }
+    .template-card .gate {
+      margin-top: 0.8rem;
+      font: 600 10px var(--mono);
+      color: var(--ok);
+      border-top: 1px dashed var(--line2);
+      padding-top: 0.7rem;
+      letter-spacing: .04em;
     }
 
     /* ===== BÔNUS ===== */
@@ -472,7 +566,7 @@
     footer a:hover { color: var(--acc); }
     @media (max-width: 480px) { footer { flex-direction: column; align-items: center; text-align: center; } }
 
-    /* ===== SCROLL REVEAL (leve) ===== */
+    /* ===== SCROLL REVEAL ===== */
     .reveal {
       opacity: 0; transform: translateY(20px); transition: opacity 0.8s ease, transform 0.8s ease;
     }
@@ -517,20 +611,25 @@
         <span class="l"><span>usa <span class="out">IA.</span></span></span>
         <span class="l"><span>Poucos operam <span class="op">um sistema.</span></span></span>
       </h1>
-      <p class="hero-sub">Este não é um curso. É o mapa de operação de quem construiu JARVAS-2, Benni Control Plane e três frameworks open source — tudo rodando em produção agora. Commits datados, não promessas.</p>
+      <!-- Manifesto do Operador -->
+      <div class="manifesto-box">
+        <p>“<em>Eu não ensino o que li. Ensino o que roda.</em>”</p>
+        <span class="sig">— Benni Alencar, arquiteto do Benni OS</span>
+      </div>
+      <p class="hero-sub"><strong>Você não entrou em um curso. Entrou em uma sala de operação.</strong> Este é o mapa de operação de quem construiu JARVAS-2, Benni Control Plane e três frameworks open source — tudo rodando em produção agora. Commits datados, não promessas.</p>
       <div class="hero-actions">
         <a href="#pricing" class="btn btn-p">Quero operar, não usar →</a>
         <a href="#chapters" class="btn btn-g">Ver os 7 capítulos</a>
       </div>
       <div class="proof">
-        <div class="proof-label">✦ Prova pública — não é slide</div>
-        <p>O ecossistema Benni OS tem três repos open source auditáveis agora: <a href="https://github.com/benni-os/mcp-forge" target="_blank" rel="noopener noreferrer">mcp-forge</a>, <a href="https://github.com/benni-os/benni-nexus" target="_blank" rel="noopener noreferrer">benni-nexus</a> e <a href="https://github.com/benni-os/benni-operator-gateway" target="_blank" rel="noopener noreferrer">benni-operator-gateway</a>. Commits datados. Testes passando. Stack real — não demo.</p>
+        <div class="proof-label">✦ Prova distribuída — cada conceito roda no sistema real</div>
+        <p>Ecossistema Benni OS: <a href="https://github.com/benni-os/mcp-forge" target="_blank">mcp-forge</a> · <a href="https://github.com/benni-os/benni-nexus" target="_blank">benni-nexus</a> · <a href="https://github.com/benni-os/benni-operator-gateway" target="_blank">benni-operator-gateway</a>. JARVAS-2 Formations rodam no Control Plane. DecisionLedger com hash encadeado em produção desde a v6. Tudo auditável.</p>
       </div>
       <div class="author">
         <div class="avatar">B</div>
         <div>
           <h4>Benni Alencar — Arquiteto do Benni OS</h4>
-          <p>Criador do JARVAS-2 (runtime autônomo Wave 6 com billing nativo), Benni Control Plane (5 serviços self-hosted em <a href="https://api.benni-os.net" target="_blank" rel="noopener noreferrer">api.benni-os.net</a>) e do ecossistema open source. Este produto é o único ponto de contato público da marca com o mercado BR.</p>
+          <p>Criador do JARVAS-2 (runtime autônomo Wave 6 com billing nativo), Benni Control Plane (5 serviços self-hosted em <a href="https://api.benni-os.net" target="_blank">api.benni-os.net</a>) e do ecossistema open source. Este produto é o único ponto de contato público da marca com o mercado BR.</p>
         </div>
       </div>
     </section>
@@ -611,105 +710,174 @@
       </div>
     </section>
 
-    <!-- ===== CAPÍTULOS ===== -->
+    <!-- ===== CAPÍTULOS (atualizados com 7 capítulos, incluindo 06 e 07 inéditos) ===== -->
     <section id="chapters">
       <div class="wrap">
         <span class="k">Roteiro</span>
         <h2>7 capítulos para operar <br>um sistema de IA real</h2>
-        <p class="sub">Áudios + materiais práticos. Cada capítulo entrega uma camada do quebra-cabeça.</p>
+        <p class="sub">Áudios + materiais práticos. Cada capítulo entrega uma camada do quebra-cabeça. <strong>Capítulos 06 e 07 são inéditos.</strong></p>
         <div class="ch-list">
+          <!-- Cap 1 -->
           <div class="ch">
             <span class="ch-num">#1</span>
             <div>
               <h4>Fundamentos do Operador Soberano</h4>
               <p>O mindset que separa quem usa de quem constrói. Princípios de arquitetura, estado e autonomia.</p>
+              <div class="ch-meta"><span>Nível: Iniciante</span><span>Pré-req: nenhum</span><span>Entrega: mentalidade + diagrama</span></div>
+              <span class="ch-prod">Roda em: JARVAS-2 Formations</span>
               <span class="ch-out">Áudio + PDF</span>
               <div class="audio-box">
-                <div class="ah"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polygon points="5,3 19,12 5,21"/></svg> Preview</div>
-                <audio controls preload="none"><source src="#" type="audio/mpeg">Seu navegador não suporta áudio.</audio>
+                <div class="ah"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polygon points="5,3 19,12 5,21"/></svg> Áudio #1</div>
+                <audio controls preload="none"><source src="https://raw.githubusercontent.com/benni-os/modo-operador/main/audio/cap01.mp3" type="audio/mpeg">Seu navegador não suporta áudio.</audio>
               </div>
             </div>
             <span class="ch-tag">BÁSICO</span>
           </div>
+          <!-- Cap 2 -->
           <div class="ch">
             <span class="ch-num">#2</span>
             <div>
               <h4>MCP na prática: conectando agentes</h4>
               <p>Como criar servidores MCP com mcp-forge e conectar ao agente para executar tarefas reais (GitHub, banco, sistema).</p>
+              <div class="ch-meta"><span>Nível: Intermediário</span><span>Pré-req: Python básico</span><span>Entrega: servidor MCP funcional</span></div>
+              <span class="ch-prod">Roda em: mcp-forge + agente</span>
               <span class="ch-out">Áudio + Código</span>
               <div class="audio-box">
-                <div class="ah"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polygon points="5,3 19,12 5,21"/></svg> Preview</div>
-                <audio controls preload="none"><source src="#" type="audio/mpeg">Seu navegador não suporta áudio.</audio>
+                <div class="ah"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polygon points="5,3 19,12 5,21"/></svg> Áudio #2</div>
+                <audio controls preload="none"><source src="https://raw.githubusercontent.com/benni-os/modo-operador/main/audio/cap02.mp3" type="audio/mpeg">Seu navegador não suporta áudio.</audio>
               </div>
             </div>
             <span class="ch-tag">MÃO NA MASSA</span>
           </div>
+          <!-- Cap 3 -->
           <div class="ch">
             <span class="ch-num">#3</span>
             <div>
               <h4>Memória e estado do agente</h4>
               <p>Estratégias para o agente lembrar de contexto, decisões e specs. Como evitar o "groundhog day" da IA.</p>
+              <div class="ch-meta"><span>Nível: Intermediário</span><span>Pré-req: servidor MCP</span><span>Entrega: agente com memória</span></div>
+              <span class="ch-prod">Roda em: Control Plane · state manager</span>
               <span class="ch-out">Áudio + Diagrama</span>
               <div class="audio-box">
-                <div class="ah"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polygon points="5,3 19,12 5,21"/></svg> Preview</div>
-                <audio controls preload="none"><source src="#" type="audio/mpeg">Seu navegador não suporta áudio.</audio>
+                <div class="ah"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polygon points="5,3 19,12 5,21"/></svg> Áudio #3</div>
+                <audio controls preload="none"><source src="https://raw.githubusercontent.com/benni-os/modo-operador/main/audio/cap03.mp3" type="audio/mpeg">Seu navegador não suporta áudio.</audio>
               </div>
             </div>
             <span class="ch-tag">ARQUITETURA</span>
           </div>
+          <!-- Cap 4 -->
           <div class="ch">
             <span class="ch-num">#4</span>
             <div>
               <h4>Pipeline autônomo: do scaffold ao deploy</h4>
               <p>Como construir um pipeline que executa sem supervisão humana, com checks e rollback automático.</p>
+              <div class="ch-meta"><span>Nível: Avançado</span><span>Pré-req: CI/CD básico</span><span>Entrega: pipeline funcional</span></div>
+              <span class="ch-prod">Roda em: GitHub Actions + JARVAS-2</span>
               <span class="ch-out">Áudio + Workflow</span>
               <div class="audio-box">
-                <div class="ah"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polygon points="5,3 19,12 5,21"/></svg> Preview</div>
-                <audio controls preload="none"><source src="#" type="audio/mpeg">Seu navegador não suporta áudio.</audio>
+                <div class="ah"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polygon points="5,3 19,12 5,21"/></svg> Áudio #4</div>
+                <audio controls preload="none"><source src="https://raw.githubusercontent.com/benni-os/modo-operador/main/audio/cap04.mp3" type="audio/mpeg">Seu navegador não suporta áudio.</audio>
               </div>
             </div>
             <span class="ch-tag">AUTOMAÇÃO</span>
           </div>
+          <!-- Cap 5 -->
           <div class="ch">
             <span class="ch-num">#5</span>
             <div>
               <h4>Gateway e roteamento de LLMs</h4>
               <p>Usando benni-nexus para rotear entre modelos (Ollama, Groq, OpenAI) com estratégia de custo/performance.</p>
+              <div class="ch-meta"><span>Nível: Intermediário</span><span>Pré-req: chave de API</span><span>Entrega: gateway configurado</span></div>
+              <span class="ch-prod">Roda em: benni-nexus</span>
               <span class="ch-out">Áudio + Código</span>
               <div class="audio-box">
-                <div class="ah"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polygon points="5,3 19,12 5,21"/></svg> Preview</div>
-                <audio controls preload="none"><source src="#" type="audio/mpeg">Seu navegador não suporta áudio.</audio>
+                <div class="ah"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polygon points="5,3 19,12 5,21"/></svg> Áudio #5</div>
+                <audio controls preload="none"><source src="https://raw.githubusercontent.com/benni-os/modo-operador/main/audio/cap05.mp3" type="audio/mpeg">Seu navegador não suporta áudio.</audio>
               </div>
             </div>
             <span class="ch-tag">INFRA</span>
           </div>
-          <div class="ch">
+          <!-- Cap 6 – INÉDITO -->
+          <div class="ch" style="border-left:2px solid var(--acc);">
             <span class="ch-num">#6</span>
             <div>
-              <h4>Observabilidade e monitoramento</h4>
-              <p>Logs, métricas e tracing para agentes. Como saber o que seu sistema está fazendo sem estar presente.</p>
-              <span class="ch-out">Áudio + Dashboard</span>
+              <h4>DecisionLedger · hash encadeado e escada de valor</h4>
+              <p>Implementação em Python de um ledger imutável para decisões de agente. Escada de valor com 4 níveis (crítico, alto, médio, baixo). Manifesto de fechamento como selo de integridade.</p>
+              <div class="ch-meta"><span>Nível: Avançado</span><span>Pré-req: Python + hashlib</span><span>Entrega: ledger funcional + manifesto</span></div>
+              <span class="ch-prod">Roda em: JARVAS-2 · ledger em produção</span>
+              <span class="ch-out">Áudio + Código + Manifesto</span>
               <div class="audio-box">
-                <div class="ah"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polygon points="5,3 19,12 5,21"/></svg> Preview</div>
-                <audio controls preload="none"><source src="#" type="audio/mpeg">Seu navegador não suporta áudio.</audio>
+                <div class="ah"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polygon points="5,3 19,12 5,21"/></svg> Áudio #6 (inédito)</div>
+                <audio controls preload="none"><source src="https://raw.githubusercontent.com/benni-os/modo-operador/main/audio/cap06.mp3" type="audio/mpeg">Seu navegador não suporta áudio.</audio>
               </div>
             </div>
-            <span class="ch-tag">OPS</span>
+            <span class="ch-tag" style="background:rgba(255,178,36,.12);">INÉDITO</span>
           </div>
-          <div class="ch">
+          <!-- Cap 7 – INÉDITO -->
+          <div class="ch" style="border-left:2px solid var(--acc);">
             <span class="ch-num">#7</span>
             <div>
-              <h4>Estratégia de billing e monetização</h4>
-              <p>Como cobrar pelo uso do seu agente com JARVAS-2. Integração com Stripe, assinaturas e créditos.</p>
+              <h4>Estratégia de billing e monetização com JARVAS-2</h4>
+              <p>Como cobrar pelo uso do seu agente com JARVAS-2. Integração com Stripe, assinaturas, créditos e análise de custo por decisão.</p>
+              <div class="ch-meta"><span>Nível: Avançado</span><span>Pré-req: conta Stripe</span><span>Entrega: sistema de billing ativo</span></div>
+              <span class="ch-prod">Roda em: JARVAS-2 · billing nativo</span>
               <span class="ch-out">Áudio + Modelo</span>
               <div class="audio-box">
-                <div class="ah"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polygon points="5,3 19,12 5,21"/></svg> Preview</div>
-                <audio controls preload="none"><source src="#" type="audio/mpeg">Seu navegador não suporta áudio.</audio>
+                <div class="ah"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polygon points="5,3 19,12 5,21"/></svg> Áudio #7 (inédito)</div>
+                <audio controls preload="none"><source src="https://raw.githubusercontent.com/benni-os/modo-operador/main/audio/cap07.mp3" type="audio/mpeg">Seu navegador não suporta áudio.</audio>
               </div>
             </div>
-            <span class="ch-tag">NEGÓCIO</span>
+            <span class="ch-tag" style="background:rgba(255,178,36,.12);">INÉDITO</span>
           </div>
         </div>
+      </div>
+    </section>
+
+    <!-- ===== PAINEL TEMPLATES ===== -->
+    <section>
+      <div class="wrap">
+        <span class="k">Painel Templates</span>
+        <h2>4 specs prontos para operar</h2>
+        <p class="sub">Scaffold, Feature, Refactor e Deploy — cada um com critério de done e Approval Gate. Linguagem de sistema, não de curso.</p>
+        <div class="template-grid">
+          <div class="template-card">
+            <h4>🧱 Scaffold</h4>
+            <div class="spec"><strong>Done:</strong> estrutura base, testes vazios, CI configurado</div>
+            <ul>
+              <li>Gera projeto com padrões do Benni OS</li>
+              <li>Setup de ambiente (Python, Docker, GitHub Actions)</li>
+            </ul>
+            <div class="gate">Approval Gate: arquitetura aprovada + seed de dados</div>
+          </div>
+          <div class="template-card">
+            <h4>✨ Feature</h4>
+            <div class="spec"><strong>Done:</strong> spec implementada, testes unitários > 80%, docs atualizada</div>
+            <ul>
+              <li>Desenvolvimento orientado a comportamento (BDD)</li>
+              <li>Revisão de pares com checklist</li>
+            </ul>
+            <div class="gate">Approval Gate: testes passando + revisão técnica</div>
+          </div>
+          <div class="template-card">
+            <h4>🔧 Refactor</h4>
+            <div class="spec"><strong>Done:</strong> melhoria de estrutura sem mudança de comportamento</div>
+            <ul>
+              <li>Identificação de code smells com ferramentas</li>
+              <li>Métricas de manutenibilidade antes/depois</li>
+            </ul>
+            <div class="gate">Approval Gate: cobertura mantida + performance estável</div>
+          </div>
+          <div class="template-card">
+            <h4>🚀 Deploy</h4>
+            <div class="spec"><strong>Done:</strong> release em produção com rollback automático</div>
+            <ul>
+              <li>Pipeline de deploy com canary ou blue-green</li>
+              <li>Monitoramento pós-deploy (logs, métricas)</li>
+            </ul>
+            <div class="gate">Approval Gate: health checks + SLOs atendidos</div>
+          </div>
+        </div>
+        <p style="margin-top:1.5rem;font-size:.85rem;color:var(--dim);text-align:center;">Cada template é usado em produção no Control Plane e JARVAS-2 Formations.</p>
       </div>
     </section>
 
@@ -891,7 +1059,6 @@
           progress = 100;
           clearInterval(interval);
           boot.classList.add('hidden');
-          // inicia efeitos pós-boot
           initReveal();
           initCursor();
           initFaq();
@@ -905,7 +1072,6 @@
         if (progress > 88 && idx === 4) updateLog();
       }, 280);
 
-      // força finalização após 6s (fallback)
       setTimeout(() => {
         if (!boot.classList.contains('hidden')) {
           progress = 100;
@@ -919,7 +1085,7 @@
       }, 7000);
 
       // ============================================================
-      // 2. SCROLL REVEAL (leve)
+      // 2. SCROLL REVEAL
       // ============================================================
       function initReveal() {
         const els = document.querySelectorAll('.reveal');
@@ -936,7 +1102,7 @@
       }
 
       // ============================================================
-      // 3. CURSOR PERSONALIZADO (desktop apenas)
+      // 3. CURSOR PERSONALIZADO
       // ============================================================
       function initCursor() {
         const cur = document.querySelector('.cur');
@@ -956,7 +1122,6 @@
         document.addEventListener('mousemove', (e) => {
           tx = e.clientX;
           ty = e.clientY;
-          // ativa efeito de hover em links/botões
           const target = e.target.closest('a, button, .faq-q, audio');
           if (target) cur.classList.add('on');
           else cur.classList.remove('on');
@@ -978,7 +1143,7 @@
       }
 
       // ============================================================
-      // 5. MOBILE: fallback para canvas (esconde em telas pequenas)
+      // 5. MOBILE: fallback para canvas
       // ============================================================
       function handleCanvas() {
         const canvas = document.getElementById('webgl');
@@ -993,7 +1158,7 @@
       handleCanvas();
 
       // ============================================================
-      // 6. SPOTLIGHT SEGUE (via CSS var) - apenas desktop
+      // 6. SPOTLIGHT SEGUE (desktop)
       // ============================================================
       if (window.matchMedia('(hover: hover)').matches) {
         document.addEventListener('mousemove', (e) => {
@@ -1002,11 +1167,7 @@
         });
       }
 
-      // ============================================================
-      // 7. ANIMAÇÃO DE ENTRADA DOS SPANS DO HERO (já feita via CSS)
-      // ============================================================
-
-      console.log('🔧 Modo Operador v7.0 carregado');
+      console.log('🔧 Modo Operador v7.0 carregado com capítulos inéditos e painel de templates');
     })();
   </script>
 </body>
