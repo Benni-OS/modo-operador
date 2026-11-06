@@ -1,1612 +1,1190 @@
-<!doctype html>
+<!DOCTYPE html>
 <html lang="pt-BR">
 <head>
-<meta charset="utf-8">
-<meta name="viewport" content="width=device-width,initial-scale=1">
-<meta name="theme-color" content="#050508">
-<meta name="description" content="Modo Operador — Formação de Elite em Engenharia de Agentes, Runtimes Locais e Autonomia. Domine mais de 10 projetos open source do Modo Operador e gere receita na nova economia da IA.">
-<title>Modo Operador — Não vendo prompts. Eu opero sistemas.</title>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=yes">
+  <title>Modo Operador — Modo Operador. Todo mundo usa IA. Poucos operam um sistema.</title>
+  <meta name="description" content="O manual técnico de engenharia de agentes para quem constrói sistemas de verdade. 7 capítulos aprofundados, 7 masterclasses em áudio e mais de 10 repositórios open source auditáveis no GitHub. Commits datados, não promessas.">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Archivo+Expanded:wght@600;800;900&family=JetBrains+Mono:wght@400;500;700&family=Inter:wght@400;500;600&display=swap" rel="stylesheet">
+  <style>
+    /* ===== RESET & VARIÁVEIS ===== */
+    * { margin: 0; padding: 0; box-sizing: border-box; }
+    :root {
+      --bg: #0a0a09; --bg2: #111110; --ink: #ecebe6; --dim: #8a897f; --dim2: #5a594f;
+      --acc: #ffb224; --acc-soft: rgba(255,178,36,.12); --ok: #5fd068; --bad: #e05d5d;
+      --line: rgba(236,235,230,.09); --line2: rgba(236,235,230,.18);
+      --mono: 'JetBrains Mono', monospace; --disp: 'Archivo Expanded', sans-serif; --body: 'Inter', sans-serif;
+      --radius: 4px;
+    }
+    html { scroll-behavior: smooth; -webkit-tap-highlight-color: transparent; }
+    body {
+      background: var(--bg); color: var(--ink); font-family: var(--body); line-height: 1.6;
+      overflow-x: hidden; -webkit-font-smoothing: antialiased;
+    }
+    ::selection { background: var(--acc); color: #0a0a09; }
+    ::-webkit-scrollbar { width: 5px; }
+    ::-webkit-scrollbar-track { background: var(--bg); }
+    ::-webkit-scrollbar-thumb { background: var(--acc); border-radius: 10px; }
 
-<link rel="preconnect" href="https://fonts.googleapis.com">
-<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-<link href="https://fonts.googleapis.com/css2?family=DM+Mono:ital,wght@0,400;0,500;1,400&family=Inter:wght@300;400;500;600;700;800&family=JetBrains+Mono:wght@400;500;600;700&family=Plus+Jakarta+Sans:wght@600;700;800;900&display=swap" rel="stylesheet">
+    /* ===== FUNDO ===== */
+    #webgl { position: fixed; inset: 0; z-index: 0; pointer-events: none; }
+    .bg-grid {
+      position: fixed; inset: 0; z-index: 0; pointer-events: none;
+      background-image:
+        linear-gradient(var(--line) 1px, transparent 1px),
+        linear-gradient(90deg, var(--line) 1px, transparent 1px);
+      background-size: 56px 56px;
+      mask-image: radial-gradient(ellipse 90% 65% at 50% 28%, #000 25%, transparent 75%);
+      -webkit-mask-image: radial-gradient(ellipse 90% 65% at 50% 28%, #000 25%, transparent 75%);
+    }
+    .noise {
+      position: fixed; inset: -100%; z-index: 60; pointer-events: none; opacity: .045;
+      background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='300' height='300'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.8' numOctaves='4'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)'/%3E%3C/svg%3E");
+      animation: grain 7s steps(9) infinite;
+    }
+    @keyframes grain { 0%,100%{transform:translate(0,0)} 12%{transform:translate(-4%,8%)} 25%{transform:translate(6%,-3%)} 38%{transform:translate(-3%,-7%)} 50%{transform:translate(8%,4%)} 62%{transform:translate(-6%,6%)} 75%{transform:translate(3%,-5%)} 88%{transform:translate(-8%,2%)} }
 
-<style>
-:root {
-  --bg: #050508;
-  --panel: #0d0e15;
-  --panel2: #12141f;
-  --panel-card: rgba(18, 20, 31, 0.75);
-  --line: rgba(255, 255, 255, 0.09);
-  --line-focus: rgba(204, 255, 70, 0.35);
-  --text: #f5f6fa;
-  --muted: #9fa3b2;
-  --dim: #606473;
-  --lime: #ccff46;
-  --lime-dim: rgba(204, 255, 70, 0.12);
-  --cyan: #80eaff;
-  --cyan-dim: rgba(128, 234, 255, 0.1);
-  --violet: #a78bfa;
-  --violet-deep: #7c3aed;
-  --emerald: #34d399;
-  --amber: #fbbf24;
-  --rose: #fb7185;
-  --r: 18px;
-  --max: 1240px;
-  --mono: 'JetBrains Mono', 'DM Mono', monospace;
-  --font-display: 'Plus Jakarta Sans', 'Inter', sans-serif;
-}
+    /* ===== CURSOR (desktop) ===== */
+    .cur, .cur-dot {
+      position: fixed; top: 0; left: 0; z-index: 300; pointer-events: none;
+      border-radius: 50%; will-change: transform;
+    }
+    .cur {
+      width: 34px; height: 34px; border: 1px solid var(--ink);
+      display: flex; align-items: center; justify-content: center;
+      transition: width .3s, height .3s, background .3s, border-color .3s;
+      transform: translate(-50%, -50%);
+    }
+    .cur.on { width: 70px; height: 70px; background: var(--acc); border-color: var(--acc); }
+    .cur span { font: 600 9px var(--mono); letter-spacing: .14em; text-transform: uppercase; color: #0a0a09; opacity: 0; transition: opacity .2s; }
+    .cur.on span { opacity: 1; }
+    .cur-dot { width: 4px; height: 4px; background: var(--acc); transform: translate(-50%, -50%); }
+    @media (hover: none) { .cur, .cur-dot { display: none; } }
 
-* { box-sizing: border-box; margin: 0; padding: 0; }
-html { scroll-behavior: smooth; }
-body {
-  background: var(--bg);
-  color: var(--text);
-  font: 16px/1.65 'Inter', -apple-system, sans-serif;
-  overflow-x: hidden;
-  -webkit-font-smoothing: antialiased;
-}
-a { text-decoration: none; color: inherit; }
+    /* ===== BOOT ===== */
+    .boot {
+      position: fixed; inset: 0; z-index: 400; background: var(--bg);
+      display: flex; flex-direction: column; justify-content: flex-end;
+      padding: 5vh 6vw; font-family: var(--mono);
+      transition: opacity 0.6s ease, visibility 0.6s ease;
+    }
+    .boot.hidden { opacity: 0; visibility: hidden; pointer-events: none; }
+    .boot-log { font-size: 12px; color: var(--dim2); line-height: 2; min-height: 180px; white-space: pre-line; }
+    .boot-log b { color: var(--ok); font-weight: 500; }
+    .boot-row {
+      display: flex; justify-content: space-between; align-items: baseline;
+      border-top: 1px solid var(--line); padding-top: 1.2rem; margin-top: 1.5rem;
+    }
+    .boot-count { font: 900 clamp(4rem, 14vw, 10rem)/0.9 var(--disp); letter-spacing: -.02em; }
+    .boot-count em { font-style: normal; color: var(--acc); font-size: .4em; }
+    .boot-bar {
+      position: fixed; top: 0; left: 0; height: 2px; width: 0%;
+      background: var(--acc); transition: width 0.3s ease;
+    }
 
-.wrap {
-  max-width: var(--max);
-  width: calc(100% - 48px);
-  margin: auto;
-  position: relative;
-  z-index: 2;
-}
-.mono { font-family: var(--mono); }
+    /* ===== NAV ===== */
+    nav {
+      position: fixed; top: 0; left: 0; right: 0; z-index: 120;
+      display: flex; justify-content: space-between; align-items: center;
+      padding: 1.1rem 2rem; border-bottom: 1px solid var(--line);
+      background: rgba(10,10,9,.72); backdrop-filter: blur(14px);
+      -webkit-backdrop-filter: blur(14px);
+      font-family: var(--mono);
+    }
+    .logo {
+      display: flex; align-items: center; gap: .7rem;
+      font: 700 .82rem var(--mono); letter-spacing: .06em; text-transform: uppercase;
+      color: var(--ink); text-decoration: none;
+    }
+    .logo i {
+      width: 9px; height: 9px; background: var(--acc); border-radius: 50%;
+      box-shadow: 0 0 10px var(--acc); animation: blink 2.4s infinite;
+    }
+    @keyframes blink { 0%,100%{opacity:1} 50%{opacity:.35} }
+    .nav-badge {
+      font: 700 10px var(--mono); letter-spacing: .14em; color: var(--acc);
+      border: 1px solid rgba(255,178,36,.35); padding: .3rem .7rem;
+      display: flex; align-items: center; gap: .5rem;
+    }
+    .nav-badge i {
+      width: 6px; height: 6px; border-radius: 50%; background: var(--ok);
+      box-shadow: 0 0 8px var(--ok); animation: blink 2s infinite;
+    }
+    .nav-cta {
+      font: 700 12px var(--mono); letter-spacing: .05em; color: #0a0a09;
+      background: var(--acc); text-decoration: none; padding: .6rem 1.2rem;
+      transition: transform .2s, box-shadow .2s;
+    }
+    .nav-cta:hover { transform: translateY(-2px); box-shadow: 0 6px 24px rgba(255,178,36,.25); }
+    @media (max-width: 860px) { .nav-badge { display: none; } }
+    @media (max-width: 480px) {
+      nav { padding: 0.8rem 1rem; }
+      .logo { font-size: 0.7rem; }
+      .nav-cta { padding: 0.4rem 0.8rem; font-size: 10px; }
+    }
 
-.grain {
-  position: fixed;
-  inset: 0;
-  pointer-events: none;
-  z-index: 10;
-  opacity: .03;
-  background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 180 180' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='.85' numOctaves='4'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)'/%3E%3C/svg%3E");
-}
+    /* ===== LAYOUT ===== */
+    main { position: relative; z-index: 10; }
+    .wrap { max-width: 920px; margin: 0 auto; padding: 0 24px; }
+    .k {
+      display: inline-flex; align-items: center; gap: .6rem;
+      font: 500 11px var(--mono); letter-spacing: .22em; text-transform: uppercase;
+      color: var(--acc); margin-bottom: 1.4rem;
+    }
+    .k::before { content: ""; width: 28px; height: 1px; background: var(--acc); }
+    h2 {
+      font: 800 clamp(1.8rem, 4.4vw, 3rem)/1.12 var(--disp);
+      letter-spacing: -.01em; margin-bottom: 1rem;
+    }
+    .sub { color: var(--dim); font-size: 1rem; max-width: 560px; }
+    section { padding: 7rem 0; border-top: 1px solid var(--line); }
+    @media (max-width: 768px) { section { padding: 4rem 0; } }
 
-/* ── NAVIGATION ── */
-.nav {
-  height: 74px;
-  border-bottom: 1px solid var(--line);
-  background: rgba(5, 5, 8, 0.78);
-  backdrop-filter: blur(18px);
-  -webkit-backdrop-filter: blur(18px);
-  position: fixed;
-  inset: 0 0 auto;
-  z-index: 50;
-}
-.nav .wrap {
-  height: 100%;
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-}
-.brand {
-  display: flex;
-  align-items: center;
-  gap: 10px;
-  font-family: var(--font-display);
-  font-weight: 800;
-  font-size: 19px;
-  letter-spacing: -0.04em;
-}
-.brand-box {
-  width: 32px;
-  height: 32px;
-  background: linear-gradient(135deg, var(--lime), #80eaff);
-  border-radius: 8px;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  color: #050508;
-  font-weight: 900;
-  font-size: 15px;
-  box-shadow: 0 0 18px rgba(204, 255, 70, 0.4);
-}
-.brand b { color: var(--lime); }
-.navlinks {
-  display: flex;
-  align-items: center;
-  gap: 28px;
-  font-size: 13.5px;
-  color: var(--muted);
-}
-.navlinks a:hover { color: #fff; }
-.navcta, .btn {
-  border: 0;
-  border-radius: 999px;
-  padding: 13px 24px;
-  font-family: var(--font-display);
-  font-weight: 700;
-  font-size: 13.5px;
-  background: var(--lime);
-  color: #080907;
-  cursor: pointer;
-  transition: all .2s cubic-bezier(0.16, 1, 0.3, 1);
-  display: inline-flex;
-  align-items: center;
-  gap: 8px;
-}
-.navcta:hover, .btn:hover {
-  transform: translateY(-2px);
-  box-shadow: 0 14px 32px rgba(204, 255, 70, 0.28);
-}
-.btn.ghost {
-  background: rgba(255, 255, 255, 0.04);
-  border: 1px solid var(--line);
-  color: var(--text);
-}
-.btn.ghost:hover {
-  background: rgba(255, 255, 255, 0.08);
-  border-color: rgba(255, 255, 255, 0.2);
-  box-shadow: 0 10px 24px rgba(0,0,0,0.4);
-}
+    /* ===== HERO ===== */
+    .hero {
+      min-height: 100svh; display: flex; flex-direction: column;
+      justify-content: center; padding: 130px 6vw 60px; border: none;
+    }
+    .hero-badge {
+      display: inline-flex; align-items: center; gap: .7rem;
+      font: 500 12px var(--mono); letter-spacing: .1em; color: var(--dim);
+      border: 1px solid var(--line2); padding: .55rem 1.1rem;
+      width: fit-content; border-radius: 99px; margin-bottom: 2.4rem;
+    }
+    .hero-badge i {
+      width: 7px; height: 7px; border-radius: 50%; background: var(--ok);
+      box-shadow: 0 0 8px var(--ok); animation: blink 2s infinite;
+    }
+    .hero h1 {
+      font: 900 clamp(2.8rem, 9vw, 7rem)/0.98 var(--disp);
+      letter-spacing: -.02em; max-width: 980px;
+    }
+    .hero h1 .l { display: block; overflow: hidden; }
+    .hero h1 .l > span {
+      display: inline-block;
+      animation: slideUp 0.8s cubic-bezier(0.22, 1, 0.36, 1) both;
+    }
+    .hero h1 .l:nth-child(1) > span { animation-delay: 0.1s; }
+    .hero h1 .l:nth-child(2) > span { animation-delay: 0.2s; }
+    .hero h1 .l:nth-child(3) > span { animation-delay: 0.3s; }
+    @keyframes slideUp {
+      0% { opacity: 0; transform: translateY(40px); }
+      100% { opacity: 1; transform: translateY(0); }
+    }
+    .hero h1 .op { color: var(--acc); }
+    .hero h1 .out { color: transparent; -webkit-text-stroke: 1.5px var(--ink); }
+    .hero-sub {
+      margin: 2rem 0 2.6rem; max-width: 580px;
+      color: var(--dim); font-size: clamp(1rem, 2vw, 1.15rem);
+    }
+    .hero-actions { display: flex; gap: 1rem; flex-wrap: wrap; }
+    .btn {
+      display: inline-flex; align-items: center; gap: .7rem;
+      font: 700 14px var(--mono); letter-spacing: .04em; text-decoration: none;
+      padding: 1.05rem 1.9rem; border: 1px solid var(--acc);
+      position: relative; overflow: hidden; z-index: 1;
+      transition: color 0.3s, border-color 0.3s;
+    }
+    .btn-p { background: var(--acc); color: #0a0a09; }
+    .btn-g { color: var(--ink); border-color: var(--line2); }
+    .btn::before {
+      content: ""; position: absolute; inset: 0;
+      background: var(--ink); transform: translateY(101%);
+      transition: transform .45s cubic-bezier(.76,0,.24,1); z-index: -1;
+    }
+    .btn:hover::before { transform: translateY(0); }
+    .btn-p:hover, .btn-g:hover { color: #0a0a09; border-color: var(--ink); }
 
-/* ── HERO SECTION ── */
-.hero {
-  min-height: 840px;
-  padding: 175px 0 100px;
-  position: relative;
-  isolation: isolate;
-  overflow: hidden;
-}
-.gridbg {
-  position: absolute;
-  inset: 0;
-  z-index: -2;
-  background:
-    linear-gradient(rgba(255, 255, 255, 0.035) 1px, transparent 1px),
-    linear-gradient(90deg, rgba(255, 255, 255, 0.035) 1px, transparent 1px);
-  background-size: 64px 64px;
-  mask-image: radial-gradient(circle at 50% 40%, #000 30%, transparent 80%);
-  opacity: .55;
-}
-.aurora {
-  position: absolute;
-  width: 1000px;
-  height: 700px;
-  right: -150px;
-  top: -120px;
-  z-index: -1;
-  background:
-    radial-gradient(ellipse at center, rgba(204, 255, 70, 0.16), transparent 58%),
-    radial-gradient(ellipse at 40% 70%, rgba(124, 58, 237, 0.15), transparent 52%),
-    radial-gradient(ellipse at 80% 30%, rgba(128, 234, 255, 0.12), transparent 48%);
-  filter: blur(28px);
-  animation: drift 11s ease-in-out infinite alternate;
-}
-@keyframes drift {
-  to { transform: translate(-40px, 40px) scale(1.06); }
-}
+    .proof {
+      border: 1px solid var(--line2); border-left: 3px solid var(--ok);
+      padding: 1.5rem 1.7rem; max-width: 780px; margin-top: 3.2rem;
+      background: rgba(95,208,104,.03);
+    }
+    .proof-label {
+      font: 700 11px var(--mono); letter-spacing: .16em;
+      text-transform: uppercase; color: var(--ok); margin-bottom: .6rem;
+    }
+    .proof p { font-size: .9rem; color: var(--dim); }
+    .proof a, .author a { color: var(--acc); text-decoration: none; border-bottom: 1px solid transparent; transition: border-color .2s; }
+    .proof a:hover, .author a:hover { border-color: var(--acc); }
+    .author {
+      display: flex; gap: 1.1rem; align-items: center;
+      max-width: 740px; margin-top: 1.2rem;
+      border: 1px solid var(--line); padding: 1.3rem 1.7rem;
+    }
+    .avatar {
+      width: 50px; height: 50px; flex-shrink: 0;
+      border: 1px solid var(--acc); display: flex; align-items: center; justify-content: center;
+      font: 800 1.2rem var(--disp); color: var(--acc);
+    }
+    .author h4 { font: 600 .9rem var(--body); margin-bottom: .2rem; }
+    .author p { font-size: .8rem; color: var(--dim); }
 
-.heroGrid {
-  display: grid;
-  grid-template-columns: 1.05fr 0.95fr;
-  align-items: center;
-  gap: 36px;
-}
-.eyebrow {
-  display: inline-flex;
-  align-items: center;
-  gap: 9px;
-  border: 1px solid rgba(204, 255, 70, 0.28);
-  background: rgba(204, 255, 70, 0.08);
-  border-radius: 999px;
-  padding: 6px 14px;
-  color: var(--lime);
-  font: 11px var(--mono);
-  letter-spacing: 0.08em;
-  margin-bottom: 20px;
-}
-.dot {
-  width: 6px;
-  height: 6px;
-  border-radius: 50%;
-  background: var(--lime);
-  box-shadow: 0 0 12px var(--lime);
-}
-h1 {
-  font-family: var(--font-display);
-  font-size: clamp(44px, 5.2vw, 80px);
-  line-height: 1.02;
-  letter-spacing: -0.05em;
-  font-weight: 800;
-  max-width: 680px;
-  margin-bottom: 22px;
-}
-h1 span {
-  background: linear-gradient(135deg, var(--lime), #80eaff);
-  -webkit-background-clip: text;
-  -webkit-text-fill-color: transparent;
-}
-.lead {
-  max-width: 580px;
-  color: var(--muted);
-  font-size: 18px;
-  line-height: 1.68;
-}
-.actions {
-  display: flex;
-  gap: 14px;
-  align-items: center;
-  margin: 34px 0 32px;
-  flex-wrap: wrap;
-}
-.meta {
-  display: flex;
-  flex-wrap: wrap;
-  gap: 12px 24px;
-  color: var(--dim);
-  font-family: var(--mono);
-  font-size: 11.5px;
-}
-.meta b { color: var(--muted); font-weight: 600; }
+    @media (max-width: 480px) {
+      .hero { padding: 100px 5vw 40px; }
+      .hero h1 { font-size: 2.2rem; }
+      .btn { padding: 0.8rem 1.2rem; font-size: 12px; }
+      .author { flex-direction: column; text-align: center; }
+    }
 
-/* ── 3D OPERATOR CORE BOX ── */
-.corebox {
-  height: 550px;
-  border: 1px solid var(--line);
-  background: radial-gradient(circle at 50% 50%, rgba(204, 255, 70, 0.06), transparent 50%), rgba(8, 9, 14, 0.85);
-  border-radius: 28px;
-  overflow: hidden;
-  position: relative;
-  box-shadow: 0 35px 120px rgba(0, 0, 0, 0.7);
-}
-#core {
-  position: absolute;
-  inset: 0;
-  width: 100%;
-  height: 100%;
-  z-index: 1;
-}
-.core-fallback {
-  position: absolute;
-  inset: 0;
-  z-index: 0;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  transition: opacity .6s ease;
-}
-.corebox.has-3d .core-fallback {
-  opacity: 0;
-  pointer-events: none;
-}
-.cf-grid {
-  position: absolute;
-  inset: 0;
-  background-image: radial-gradient(rgba(255, 255, 255, 0.09) 1px, transparent 1px);
-  background-size: 26px 26px;
-  mask-image: radial-gradient(circle at 50% 50%, #000 35%, transparent 75%);
-  opacity: .55;
-}
-.cf-core {
-  width: 140px;
-  height: 140px;
-  background: radial-gradient(circle at 35% 30%, rgba(224, 255, 150, 0.95), rgba(204, 255, 70, 0.4) 45%, transparent 75%);
-  border-radius: 44% 56% 52% 48%/45% 42% 58% 55%;
-  box-shadow: 0 0 80px rgba(204, 255, 70, 0.5), 0 0 160px rgba(204, 255, 70, 0.25);
-  animation: cfBreathe 4.5s ease-in-out infinite, cfMorph 10s ease-in-out infinite;
-}
-@keyframes cfBreathe {
-  0%, 100% { transform: scale(1); }
-  50% { transform: scale(1.08); }
-}
-@keyframes cfMorph {
-  0%, 100% { border-radius: 44% 56% 52% 48%/45% 42% 58% 55%; }
-  50% { border-radius: 58% 42% 40% 60%/55% 60% 40% 45%; }
-}
-.cf-ring {
-  position: absolute;
-  border-radius: 50%;
-  border: 1px dashed rgba(204, 255, 70, 0.35);
-}
-.cf-ring1 { width: 230px; height: 230px; animation: cfSpin 16s linear infinite; }
-.cf-ring2 { width: 310px; height: 310px; border-color: rgba(128, 234, 255, 0.35); animation: cfSpin 22s linear infinite reverse; }
-.cf-ring3 { width: 395px; height: 395px; border-style: solid; border-color: rgba(255, 255, 255, 0.1); animation: cfSpin 34s linear infinite; }
-@keyframes cfSpin { to { transform: rotate(360deg); } }
+    /* ===== MANIFESTO DO OPERADOR ===== */
+    .manifesto-box {
+      border-left: 4px solid var(--acc);
+      background: var(--acc-soft);
+      padding: 1.8rem 2rem;
+      margin: 2rem 0 2.6rem;
+      max-width: 740px;
+    }
+    .manifesto-box p {
+      font: 800 1.4rem/1.3 var(--disp);
+      letter-spacing: -.01em;
+      color: var(--ink);
+    }
+    .manifesto-box p em {
+      font-style: normal;
+      color: var(--acc);
+    }
+    .manifesto-box .sig {
+      display: block;
+      margin-top: 0.8rem;
+      font: 500 12px var(--mono);
+      color: var(--dim2);
+      text-transform: uppercase;
+      letter-spacing: .2em;
+    }
 
-.coreHud {
-  position: absolute;
-  inset: 24px;
-  pointer-events: none;
-  display: flex;
-  justify-content: space-between;
-  align-items: flex-start;
-  font: 11px var(--mono);
-  color: #8e92a0;
-  z-index: 2;
-}
-.live {
-  color: var(--lime);
-  display: flex;
-  gap: 8px;
-  align-items: center;
-}
-.live i {
-  width: 6px;
-  height: 6px;
-  background: var(--lime);
-  border-radius: 50%;
-  box-shadow: 0 0 12px var(--lime);
-}
-.corner {
-  border: 1px solid var(--line);
-  padding: 8px 12px;
-  border-radius: 8px;
-  background: rgba(8, 9, 14, 0.85);
-  backdrop-filter: blur(8px);
-}
-.scan {
-  position: absolute;
-  left: 0;
-  right: 0;
-  height: 1px;
-  background: linear-gradient(90deg, transparent, var(--lime), transparent);
-  opacity: .55;
-  animation: scanLine 6s linear infinite;
-  z-index: 3;
-}
-@keyframes scanLine {
-  0% { top: 0; }
-  100% { top: 100%; }
-}
+    /* ===== STATEMENT ===== */
+    .statement { padding: 9rem 6vw; text-align: center; }
+    .statement blockquote {
+      font: 800 clamp(1.6rem, 4.6vw, 3.2rem)/1.25 var(--disp);
+      letter-spacing: -.01em; max-width: 860px; margin: 0 auto;
+    }
+    .statement blockquote .a { color: var(--acc); }
+    .statement blockquote .s { color: transparent; -webkit-text-stroke: 1px var(--dim2); }
+    .statement cite {
+      display: block; margin-top: 2rem;
+      font: 500 12px var(--mono); color: var(--dim2);
+      letter-spacing: .2em; text-transform: uppercase; font-style: normal;
+    }
 
-/* ── SECTIONS SHARED ── */
-section {
-  padding: 120px 0;
-  border-top: 1px solid var(--line);
-  position: relative;
-}
-.label {
-  font: 11px var(--mono);
-  letter-spacing: 0.12em;
-  text-transform: uppercase;
-  color: var(--lime);
-  margin-bottom: 14px;
-  display: flex;
-  align-items: center;
-  gap: 8px;
-}
-h2 {
-  font-family: var(--font-display);
-  font-size: clamp(34px, 4vw, 56px);
-  letter-spacing: -0.05em;
-  line-height: 1.05;
-  max-width: 820px;
-  margin-bottom: 20px;
-  font-weight: 800;
-}
-.sectionLead {
-  color: var(--muted);
-  max-width: 680px;
-  font-size: 17.5px;
-  margin-bottom: 48px;
-  line-height: 1.7;
-}
+    /* ===== DIFF ===== */
+    .diff-cols {
+      display: grid; grid-template-columns: 1fr 1fr; gap: 20px; margin-top: 3rem;
+    }
+    @media (max-width: 680px) { .diff-cols { grid-template-columns: 1fr; } }
+    .diff-card {
+      padding: 1.8rem; border: 1px solid var(--line);
+      transition: background 0.2s;
+    }
+    .diff-card.bad { border-top: 2px solid var(--bad); }
+    .diff-card.good { border-top: 2px solid var(--ok); background: rgba(95,208,104,.03); }
+    .diff-card .lbl {
+      font: 700 11px var(--mono); letter-spacing: .14em; text-transform: uppercase; margin-bottom: 1.1rem;
+    }
+    .diff-card.bad .lbl { color: var(--bad); }
+    .diff-card.good .lbl { color: var(--ok); }
+    .diff-list { list-style: none; display: flex; flex-direction: column; gap: .6rem; }
+    .diff-list li { font-size: .87rem; color: var(--dim); display: flex; gap: .7rem; }
+    .diff-card.bad .diff-list li::before { content: "✗"; color: var(--bad); }
+    .diff-card.good .diff-list li::before { content: "✓"; color: var(--ok); font-weight: 700; }
+    .verdict {
+      margin-top: 1.3rem; padding-top: 1.1rem; border-top: 1px dashed var(--line2);
+      font: 700 .78rem var(--mono); letter-spacing: .06em;
+    }
+    .diff-card.bad .verdict { color: var(--bad); }
+    .diff-card.good .verdict { color: var(--ok); }
 
-/* ── BENTO GRID ── */
-.bento {
-  display: grid;
-  grid-template-columns: repeat(12, 1fr);
-  gap: 16px;
-}
-.card {
-  border: 1px solid var(--line);
-  border-radius: var(--r);
-  padding: 30px;
-  background: linear-gradient(145deg, var(--panel2), var(--panel));
-  position: relative;
-  overflow: hidden;
-  transition: all .25s ease;
-}
-.card:hover {
-  border-color: rgba(204, 255, 70, 0.3);
-  transform: translateY(-3px);
-  box-shadow: 0 20px 40px rgba(0, 0, 0, 0.5);
-}
-.card::before {
-  content: "";
-  position: absolute;
-  inset: 0;
-  background: radial-gradient(circle at 100% 0, rgba(128, 234, 255, 0.08), transparent 45%);
-  pointer-events: none;
-}
-.c12 { grid-column: span 12; }
-.c7 { grid-column: span 7; }
-.c5 { grid-column: span 5; }
-.c4 { grid-column: span 4; }
-.c6 { grid-column: span 6; }
+    /* ===== OSS & PROP ===== */
+    .oss-grid {
+      display: grid; grid-template-columns: repeat(auto-fill, minmax(250px, 1fr));
+      gap: 14px; margin-top: 2.6rem;
+    }
+    
+    .oss-card, .prop-card {
+      border: 1px solid var(--line); padding: 1.5rem;
+      text-decoration: none; display: block;
+      transition: border-color .3s, transform .3s; background: var(--bg);
+    }
+    .oss-card:hover { border-color: var(--acc); transform: translateY(-3px); }
+    .prop-card { border-color: rgba(255,178,36,.25); background: var(--acc-soft); }
+    .tag {
+      font: 700 10px var(--mono); letter-spacing: .12em; text-transform: uppercase;
+      padding: .2rem .55rem; display: inline-block; margin-bottom: .8rem;
+      border: 1px solid;
+    }
+    .oss-card .tag { color: var(--ok); border-color: rgba(95,208,104,.4); }
+    .prop-card .tag { color: var(--acc); border-color: rgba(255,178,36,.4); }
+    .oss-card h4, .prop-card h4 { font: 600 .92rem var(--body); margin-bottom: .4rem; }
+    .oss-card p, .prop-card p { font-size: .8rem; color: var(--dim); }
+    
+    
+    
 
-.cardTag {
-  font: 10.5px var(--mono);
-  color: var(--cyan);
-  letter-spacing: 0.1em;
-  font-weight: 700;
-  text-transform: uppercase;
-}
-.card h3 {
-  font-family: var(--font-display);
-  font-size: 22px;
-  letter-spacing: -0.03em;
-  margin: 16px 0 10px;
-  font-weight: 700;
-}
-.card p {
-  color: var(--muted);
-  font-size: 14.5px;
-  line-height: 1.68;
-}
-.chips {
-  margin-top: 22px;
-  display: flex;
-  gap: 8px;
-  flex-wrap: wrap;
-}
-.chip {
-  border: 1px solid var(--line);
-  color: var(--dim);
-  border-radius: 6px;
-  padding: 4px 8px;
-  font: 10.5px var(--mono);
-}
+    /* ===== CAPÍTULOS ===== */
+    .ch-list { margin-top: 3rem; display: flex; flex-direction: column; }
+    .ch {
+      display: grid; grid-template-columns: 64px 1fr auto;
+      gap: 1.4rem; padding: 1.8rem 1.4rem;
+      border-top: 1px solid var(--line); transition: background .3s;
+    }
+    .ch:last-child { border-bottom: 1px solid var(--line); }
+    .ch:hover { background: rgba(255,178,36,.03); }
+    .ch-num { font: 500 12px var(--mono); color: var(--dim2); padding-top: .25rem; }
+    .ch h4 { font: 600 1.05rem var(--body); margin-bottom: .4rem; }
+    .ch p { font-size: .85rem; color: var(--dim); margin-bottom: .7rem; }
+    .ch-meta {
+      display: flex; flex-wrap: wrap; gap: 0.8rem 1.2rem;
+      font: 500 11px var(--mono); color: var(--dim2);
+      margin: 0.4rem 0 0.8rem;
+    }
+    .ch-meta span::before {
+      content: "◆ ";
+      color: var(--acc);
+      font-size: 8px;
+      vertical-align: middle;
+      margin-right: 4px;
+    }
+    .ch-prod {
+      display: inline-block;
+      font: 600 9px var(--mono);
+      letter-spacing: .06em;
+      text-transform: uppercase;
+      color: var(--ok);
+      background: rgba(95,208,104,.12);
+      padding: .15rem .6rem;
+      border-radius: 12px;
+      margin-top: 0.2rem;
+    }
+    .ch-out {
+      font: 500 11px var(--mono); color: var(--acc);
+      border: 1px solid rgba(255,178,36,.3); padding: .3rem .7rem; display: inline-block;
+    }
+    .ch-tag {
+      font: 700 10px var(--mono); letter-spacing: .1em; color: var(--acc);
+      border: 1px solid rgba(255,178,36,.35); padding: .25rem .6rem;
+      height: fit-content; white-space: nowrap;
+    }
+    .audio-box {
+      margin-top: 1rem; border: 1px solid rgba(255,178,36,.28);
+      padding: .8rem 1rem; background: var(--bg2);
+    }
+    .audio-box .ah {
+      display: flex; align-items: center; gap: .5rem;
+      font: 700 10px var(--mono); letter-spacing: .14em; text-transform: uppercase;
+      color: var(--dim); margin-bottom: .5rem;
+    }
+    .audio-box audio { width: 100%; height: 34px; filter: invert(.9) hue-rotate(180deg) saturate(.6); }
+    @media (max-width: 640px) {
+      .ch { grid-template-columns: 1fr; }
+      .ch-num, .ch-tag { display: none; }
+    }
 
-/* ── REPOSITORIES GRID ── */
-.repo-grid {
-  display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
-  gap: 16px;
-  margin-top: 32px;
-}
-.repo-card {
-  background: linear-gradient(145deg, #0e1018, #0a0b12);
-  border: 1px solid var(--line);
-  border-radius: 14px;
-  padding: 24px;
-  transition: all .2s ease;
-  display: flex;
-  flex-direction: column;
-  justify-content: space-between;
-}
-.repo-card:hover {
-  border-color: rgba(204, 255, 70, 0.35);
-  transform: translateY(-2px);
-  box-shadow: 0 16px 36px rgba(0, 0, 0, 0.5);
-}
-.repo-head {
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  margin-bottom: 12px;
-}
-.repo-title {
-  font-family: var(--mono);
-  font-size: 14.5px;
-  font-weight: 700;
-  color: #fff;
-  display: flex;
-  align-items: center;
-  gap: 8px;
-}
-.repo-badge {
-  font-family: var(--mono);
-  font-size: 9.5px;
-  font-weight: 700;
-  background: rgba(52, 211, 153, 0.1);
-  border: 1px solid rgba(52, 211, 153, 0.25);
-  color: var(--emerald);
-  padding: 2px 7px;
-  border-radius: 4px;
-}
-.repo-desc {
-  font-size: 13px;
-  color: var(--muted);
-  line-height: 1.6;
-  margin-bottom: 18px;
-}
-.repo-foot {
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  border-top: 1px solid rgba(255, 255, 255, 0.05);
-  padding-top: 14px;
-  font-size: 12px;
-}
-.repo-lang {
-  color: var(--dim);
-  font-family: var(--mono);
-  font-size: 11px;
-}
-.repo-link {
-  color: var(--lime);
-  font-weight: 600;
-  display: flex;
-  align-items: center;
-  gap: 4px;
-}
-.repo-link:hover { text-decoration: underline; }
+    /* ===== PAINEL TEMPLATES ===== */
+    .template-grid {
+      display: grid; grid-template-columns: repeat(auto-fill, minmax(240px, 1fr));
+      gap: 16px; margin-top: 2.6rem;
+    }
+    .template-card {
+      border: 1px solid var(--line2);
+      padding: 1.8rem 1.4rem;
+      background: rgba(255,178,36,.03);
+      transition: border-color .3s;
+    }
+    .template-card:hover { border-color: var(--acc); }
+    .template-card h4 {
+      font: 700 1rem var(--body);
+      color: var(--acc);
+      margin-bottom: 0.4rem;
+    }
+    .template-card .spec {
+      font: 500 11px var(--mono);
+      color: var(--dim2);
+      margin-bottom: 0.6rem;
+    }
+    .template-card .spec strong { color: var(--ink); }
+    .template-card ul {
+      list-style: none;
+      font-size: .8rem;
+      color: var(--dim);
+      display: flex;
+      flex-direction: column;
+      gap: .4rem;
+      margin-top: .6rem;
+    }
+    .template-card ul li::before {
+      content: "▹ ";
+      color: var(--acc);
+    }
+    .template-card .gate {
+      margin-top: 0.8rem;
+      font: 600 10px var(--mono);
+      color: var(--ok);
+      border-top: 1px dashed var(--line2);
+      padding-top: 0.7rem;
+      letter-spacing: .04em;
+    }
 
-/* ── PROOF SECTION & VIDEO PLAYER ── */
-.demo {
-  display: grid;
-  grid-template-columns: 1.15fr 0.85fr;
-  border: 1px solid var(--line);
-  border-radius: 26px;
-  overflow: hidden;
-  background: var(--panel);
-  box-shadow: 0 30px 80px rgba(0, 0, 0, 0.6);
-}
-.screen-video {
-  background: #000;
-  position: relative;
-  min-height: 440px;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-}
-.screen-video video {
-  width: 100%;
-  height: 100%;
-  object-fit: cover;
-  display: block;
-}
-.proofcopy {
-  padding: 46px;
-  display: flex;
-  flex-direction: column;
-  justify-content: center;
-}
-.proofcopy h3 {
-  font-family: var(--font-display);
-  font-size: 32px;
-  letter-spacing: -0.04em;
-  line-height: 1.1;
-  margin: 12px 0 14px;
-  font-weight: 800;
-}
-.proofcopy p {
-  color: var(--muted);
-  margin-bottom: 24px;
-  font-size: 15px;
-  line-height: 1.65;
-}
-.prooflist { list-style: none; }
-.prooflist li {
-  border-top: 1px solid var(--line);
-  padding: 13px 0;
-  color: var(--muted);
-  font-size: 14px;
-  display: flex;
-  align-items: center;
-  gap: 12px;
-}
-.prooflist b {
-  color: var(--lime);
-  font-family: var(--mono);
-  font-size: 12px;
-}
+    /* ===== BÔNUS ===== */
+    .bonus-grid {
+      display: grid; grid-template-columns: repeat(3, 1fr); gap: 14px; margin-top: 3rem;
+    }
+    @media (max-width: 760px) { .bonus-grid { grid-template-columns: 1fr; } }
+    .bonus {
+      border: 1px solid rgba(95,208,104,.2); padding: 1.7rem;
+      position: relative; background: rgba(95,208,104,.02);
+      transition: border-color .3s;
+    }
+    .bonus:hover { border-color: rgba(95,208,104,.45); }
+    .bonus::before {
+      content: "BÔNUS"; position: absolute; top: 1rem; right: 1rem;
+      font: 700 9px var(--mono); letter-spacing: .12em; color: var(--ok);
+      border: 1px solid rgba(95,208,104,.3); padding: .15rem .5rem;
+    }
+    .bonus h3 { font: 600 .95rem var(--body); margin: .9rem 0 .5rem; }
+    .bonus p { font-size: .83rem; color: var(--dim); margin-bottom: .8rem; }
+    .bonus .val { font: 500 11px var(--mono); color: var(--dim2); }
+    .bonus .val b { color: var(--ok); font-weight: 600; }
+    @media (max-width: 480px) {
+      .bonus { padding: 1.2rem; }
+      .bonus::before { position: static; display: inline-block; margin-bottom: 0.5rem; }
+    }
 
-/* ── TERMINAL LIVE SIMULATOR ── */
-.term-box {
-  background: #06070a;
-  border: 1px solid var(--line);
-  border-radius: var(--r);
-  overflow: hidden;
-  margin-top: 32px;
-  box-shadow: 0 25px 60px rgba(0, 0, 0, 0.7);
-}
-.term-bar {
-  background: #0e1017;
-  padding: 12px 18px;
-  display: flex;
-  align-items: center;
-  gap: 8px;
-  border-bottom: 1px solid var(--line);
-}
-.term-dots { display: flex; gap: 6px; }
-.term-dots i { width: 10px; height: 10px; border-radius: 50%; }
-.term-dots i:nth-child(1) { background: #f87171; }
-.term-dots i:nth-child(2) { background: #fbbf24; }
-.term-dots i:nth-child(3) { background: #34d399; }
-.term-title { margin-left: 10px; font: 11px var(--mono); color: var(--dim); }
-.term-presets {
-  display: flex;
-  gap: 8px;
-  padding: 12px 18px;
-  background: rgba(255, 255, 255, 0.02);
-  border-bottom: 1px solid var(--line);
-  flex-wrap: wrap;
-}
-.term-btn {
-  font: 11px var(--mono);
-  background: rgba(255, 255, 255, 0.05);
-  border: 1px solid var(--line);
-  color: var(--text-muted);
-  padding: 5px 10px;
-  border-radius: 6px;
-  cursor: pointer;
-  transition: all .15s;
-}
-.term-btn:hover { color: var(--lime); border-color: rgba(204, 255, 70, 0.35); }
-.term-body {
-  padding: 24px;
-  font: 13px/1.8 var(--mono);
-  color: #c7cde2;
-  min-height: 240px;
-  max-height: 380px;
-  overflow-y: auto;
-}
+    /* ===== STATS ===== */
+    .stats {
+      display: grid; grid-template-columns: repeat(4, 1fr);
+      gap: 1px; background: var(--line); border: 1px solid var(--line); margin-top: 3rem;
+    }
+    .stat { background: var(--bg); padding: 2rem 1.2rem; text-align: center; }
+    .stat b {
+      font: 900 clamp(1.8rem, 4.6vw, 2.8rem) var(--disp);
+      color: var(--acc); display: block; letter-spacing: -.02em;
+    }
+    .stat span { font: 500 10px var(--mono); color: var(--dim); letter-spacing: .06em; }
+    @media (max-width: 680px) { .stats { grid-template-columns: 1fr 1fr; } }
 
-/* ── CALCULATOR ── */
-.calc-card {
-  background: linear-gradient(145deg, var(--panel2), var(--panel));
-  border: 1px solid var(--line);
-  border-radius: 24px;
-  padding: 44px;
-  display: grid;
-  grid-template-columns: 1fr 1fr;
-  gap: 40px;
-  align-items: center;
-}
-.calc-slider-wrap { display: flex; flex-direction: column; gap: 16px; }
-.calc-slider {
-  -webkit-appearance: none;
-  width: 100%;
-  height: 6px;
-  background: rgba(255, 255, 255, 0.12);
-  border-radius: 3px;
-  outline: none;
-  cursor: pointer;
-}
-.calc-slider::-webkit-slider-thumb {
-  -webkit-appearance: none;
-  width: 20px;
-  height: 20px;
-  background: var(--lime);
-  border-radius: 50%;
-  cursor: pointer;
-  box-shadow: 0 0 16px var(--lime);
-}
-.calc-metric-box {
-  background: #08090f;
-  border: 1px solid rgba(204, 255, 70, 0.25);
-  border-radius: 16px;
-  padding: 30px;
-  text-align: center;
-}
-.calc-big-num {
-  font-family: var(--font-display);
-  font-size: 52px;
-  font-weight: 800;
-  color: var(--lime);
-  line-height: 1;
-  margin-bottom: 8px;
-}
+    /* ===== DEPOIMENTOS ===== */
+    .tst-grid {
+      display: grid; grid-template-columns: repeat(auto-fill, minmax(270px, 1fr));
+      gap: 14px; margin-top: 3rem;
+    }
+    .tst { border: 1px solid var(--line); padding: 1.6rem; }
+    .tst .st { color: var(--acc); font-size: .8rem; letter-spacing: .2em; margin-bottom: .8rem; }
+    .tst p { font-size: .87rem; color: var(--dim); margin-bottom: 1.1rem; }
+    .tst .who { display: flex; align-items: center; gap: .7rem; }
+    .tst .av {
+      width: 34px; height: 34px; border: 1px solid var(--acc);
+      display: flex; align-items: center; justify-content: center;
+      font: 700 12px var(--mono); color: var(--acc);
+    }
+    .tst .nm { font: 600 .82rem var(--body); }
+    .tst .rl { font: 400 .72rem var(--mono); color: var(--dim2); }
 
-/* ── OFFER & CHECKOUT ── */
-.offer {
-  display: grid;
-  grid-template-columns: 1fr 460px;
-  gap: 50px;
-  border: 1px solid rgba(204, 255, 70, 0.3);
-  background: radial-gradient(circle at 85% 15%, rgba(204, 255, 70, 0.12), transparent 40%), var(--panel);
-  border-radius: 28px;
-  padding: 54px;
-  box-shadow: 0 40px 100px rgba(0, 0, 0, 0.6);
-}
-.offer h2 { font-size: clamp(34px, 4vw, 48px); }
-.offer ul {
-  padding: 0;
-  list-style: none;
-  color: var(--muted);
-  font-size: 15px;
-  margin: 28px 0;
-}
-.offer li {
-  margin: 14px 0;
-  display: flex;
-  align-items: center;
-  gap: 12px;
-}
-.offer li::before {
-  content: "✓";
-  color: var(--lime);
-  font-weight: 800;
-}
-.form {
-  border: 1px solid var(--line);
-  border-radius: 20px;
-  background: #090a0f;
-  padding: 28px;
-}
-.form label {
-  display: block;
-  color: var(--muted);
-  font-size: 12px;
-  margin-bottom: 7px;
-  font-weight: 600;
-}
-.form input {
-  width: 100%;
-  border: 1px solid var(--line);
-  border-radius: 10px;
-  background: #11131c;
-  padding: 14px 16px;
-  color: #fff;
-  font: 14px 'Inter', sans-serif;
-  margin-bottom: 16px;
-  outline: none;
-  transition: all .15s;
-}
-.form input:focus {
-  border-color: var(--lime);
-  outline: 2px solid rgba(204, 255, 70, 0.25);
-}
-.form .btn {
-  width: 100%;
-  padding: 15px;
-  justify-content: center;
-  font-size: 14.5px;
-}
-.message {
-  display: none;
-  padding: 14px;
-  margin-top: 14px;
-  border-radius: 10px;
-  font-size: 13.5px;
-}
-.message.ok {
-  display: block;
-  background: rgba(204, 255, 70, 0.12);
-  border: 1px solid rgba(204, 255, 70, 0.3);
-  color: #e7ffac;
-}
-.message.err {
-  display: block;
-  background: rgba(255, 100, 120, 0.12);
-  border: 1px solid rgba(255, 100, 120, 0.3);
-  color: #ffc4cc;
-}
+    /* ===== PRICING ===== */
+    .price-card {
+      max-width: 520px; margin: 3rem auto 0;
+      border: 1px solid var(--line2); padding: 3rem;
+      text-align: center; position: relative; background: var(--bg); overflow: hidden;
+    }
+    .price-card::before {
+      content: ""; position: absolute; top: 0; left: -60%; width: 60%; height: 2px;
+      background: var(--acc); animation: sweep 3.2s cubic-bezier(.76,0,.24,1) infinite;
+    }
+    @keyframes sweep { 0% { left: -60%; } 60%,100% { left: 100%; } }
+    .badge {
+      display: inline-block; font: 600 11px var(--mono); letter-spacing: .1em;
+      color: var(--acc); border: 1px solid rgba(255,178,36,.4);
+      padding: .3rem .9rem; margin-bottom: 1.4rem;
+    }
+    .old { font: 500 .95rem var(--mono); color: var(--dim2); text-decoration: line-through; }
+    .big {
+      font: 900 clamp(3.4rem, 9vw, 4.6rem)/1 var(--disp);
+      color: var(--acc); margin: .3rem 0 .2rem;
+    }
+    .big small { font: 500 1.1rem var(--mono); color: var(--dim); vertical-align: top; }
+    .period { font: 500 12px var(--mono); color: var(--dim2); margin-bottom: 2rem; }
+    .inc { list-style: none; text-align: left; display: flex; flex-direction: column; gap: .6rem; margin-bottom: 2.2rem; }
+    .inc li { font-size: .86rem; color: var(--dim); display: flex; gap: .7rem; }
+    .inc li::before { content: "✓"; color: var(--ok); font-weight: 700; }
+    .inc li b { color: var(--acc); font-weight: 500; font-size: .72rem; font-family: var(--mono); }
+    .guar { margin-top: 1rem; font: 500 11px var(--mono); color: var(--dim2); }
+    @media (max-width: 480px) { .price-card { padding: 2rem 1.4rem; } }
 
-/* ── FAQ ── */
-.faq-grid {
-  display: flex;
-  flex-direction: column;
-  gap: 14px;
-  max-width: 860px;
-}
-.faq-item {
-  border: 1px solid var(--line);
-  border-radius: 14px;
-  background: var(--panel);
-  padding: 22px 26px;
-  cursor: pointer;
-  transition: all .2s;
-}
-.faq-item:hover { border-color: rgba(255, 255, 255, 0.18); }
-.faq-q {
-  font-family: var(--font-display);
-  font-size: 17px;
-  font-weight: 700;
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-}
-.faq-a {
-  display: none;
-  color: var(--muted);
-  font-size: 14.5px;
-  line-height: 1.7;
-  margin-top: 14px;
-  border-top: 1px solid var(--line);
-  padding-top: 14px;
-}
-.faq-item.active .faq-a { display: block; }
-.faq-item.active .faq-icon { transform: rotate(45deg); color: var(--lime); }
-.faq-icon { transition: transform .2s ease; font-size: 18px; }
+    /* ===== FAQ ===== */
+    .faq { max-width: 680px; margin: 3rem auto 0; text-align: left; }
+    .faq-item { border: 1px solid var(--line); margin-bottom: 6px; }
+    .faq-q {
+      padding: 1.1rem 1.3rem; font: 600 .92rem var(--body);
+      display: flex; justify-content: space-between; gap: 1rem;
+      cursor: pointer; user-select: none;
+      transition: background .2s;
+    }
+    .faq-q:hover { background: rgba(255,178,36,.04); }
+    .faq-q i {
+      font-style: normal; color: var(--acc); font-family: var(--mono);
+      transition: transform .3s;
+    }
+    .faq-item.open .faq-q i { transform: rotate(45deg); }
+    .faq-a {
+      max-height: 0; overflow: hidden;
+      transition: max-height .4s ease;
+    }
+    .faq-item.open .faq-a { max-height: 320px; }
+    .faq-a p { font-size: .86rem; color: var(--dim); padding: 0 1.3rem 1.2rem; }
 
-/* ── FOOTER ── */
-footer {
-  padding: 48px 0;
-  border-top: 1px solid var(--line);
-  color: var(--dim);
-  font-size: 13px;
-}
-footer .wrap {
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-  flex-wrap: wrap;
-  gap: 16px;
-}
+    /* ===== MARQUEE & FINAL ===== */
+    .mq {
+      overflow: hidden; border-top: 1px solid var(--line); border-bottom: 1px solid var(--line);
+      padding: 1.1rem 0; white-space: nowrap;
+    }
+    .mq-t {
+      display: inline-flex; gap: 2.6rem; will-change: transform;
+      font: 800 clamp(1.1rem, 2.4vw, 1.6rem) var(--disp);
+      text-transform: uppercase; letter-spacing: .02em;
+      animation: marquee 25s linear infinite;
+    }
+    @keyframes marquee { 0% { transform: translateX(0); } 100% { transform: translateX(-50%); } }
+    .mq-t span:nth-child(4n+2) { color: transparent; -webkit-text-stroke: 1px var(--dim2); }
+    .mq-t em { color: var(--acc); font-family: var(--mono); font-weight: 400; font-style: normal; }
 
-/* Reveal Transitions */
-.fadein {
-  opacity: 0;
-  transform: translateY(22px);
-  transition: opacity .75s cubic-bezier(0.16, 1, 0.3, 1), transform .75s cubic-bezier(0.16, 1, 0.3, 1);
-}
-.fadein.in { opacity: 1; transform: none; }
+    .final { padding: 9rem 6vw; text-align: center; border-top: none; }
+    .final h2 { font-size: clamp(2rem, 5.4vw, 3.6rem); max-width: 780px; margin: 0 auto 1.2rem; }
+    .final h2 em { font-style: normal; color: var(--acc); }
+    .final .sub { margin: 0 auto 2.4rem; }
 
-@media(max-width: 960px) {
-  .heroGrid, .demo, .calc-card, .offer { grid-template-columns: 1fr; }
-  .hero { padding-top: 140px; }
-  .corebox { height: 440px; }
-  .c7, .c5, .c4, .c6 { grid-column: span 12; }
-  .navlinks > a:not(.navcta) { display: none; }
-  .offer { padding: 34px 24px; }
-}
-@media(max-width: 540px) {
-  .wrap { width: calc(100% - 32px); }
-  h1 { font-size: 42px; }
-  .corebox { height: 360px; }
-}
-</style>
+    /* ===== FOOTER ===== */
+    footer {
+      border-top: 1px solid var(--line); padding: 1.6rem 6vw;
+      display: flex; justify-content: space-between; flex-wrap: wrap;
+      gap: .8rem; font: 500 11px var(--mono); color: var(--dim2);
+    }
+    footer a { color: var(--dim); text-decoration: none; transition: color .2s; }
+    footer a:hover { color: var(--acc); }
+    @media (max-width: 480px) { footer { flex-direction: column; align-items: center; text-align: center; } }
+
+    /* ===== SCROLL REVEAL ===== */
+    .reveal {
+      opacity: 0; transform: translateY(20px); transition: opacity 0.8s ease, transform 0.8s ease;
+    }
+    .reveal.visible { opacity: 1; transform: translateY(0); }
+  </style>
 </head>
 <body>
-<div class="grain"></div>
 
-<!-- NAVIGATION -->
-<nav class="nav">
-  <div class="wrap">
-    <a class="brand" href="#">
-      <div class="brand-box">⚡</div>
-      <span>Modo <b>Operador</b></span>
-    </a>
-    <div class="navlinks">
-      <a href="#arsenal-open-source">Arsenal Open Source (+10 Repos)</a>
-      <a href="#monetizacao">Como Gerar Receita</a>
-      <a href="#conteudo">O Que Inclui</a>
-      <a href="#prova">Prova de Engenharia</a>
-      <a href="#acesso" class="navcta">Garantir Acesso à Formação →</a>
+  <!-- ===== CANVAS ===== -->
+  <canvas id="webgl"></canvas>
+  <div class="bg-grid"></div>
+  <div class="noise"></div>
+
+  <!-- ===== CURSOR ===== -->
+  <div class="cur"><span>→</span></div>
+  <div class="cur-dot"></div>
+
+  <!-- ===== BOOT ===== -->
+  <div class="boot" id="boot">
+    <div class="boot-bar" id="bootBar"></div>
+    <div class="boot-log" id="bootLog"></div>
+    <div class="boot-row">
+      <span>benni-os 7.0 :: modo operador</span>
+      <span class="boot-count"><em>&gt;&nbsp;</em><span id="bootPct">0</span><em>%</em></span>
     </div>
   </div>
-</nav>
 
-<main>
-  <!-- HERO SECTION -->
-  <section class="hero">
-    <div class="gridbg"></div>
-    <div class="aurora"></div>
-    <div class="wrap heroGrid">
-      <div class="fadein">
-        <div class="eyebrow"><i class="dot"></i> ECOSSISTEMA MODO OPERADOR · +10 REPOSITÓRIOS OPEN SOURCE</div>
-        <h1>Não vendo prompts.<br>Eu opero <span>sistemas.</span></h1>
-        <p class="lead">A era dos "chatbots passivos" e digitadores manuais de prompt acabou. O Modo Operador é a formação técnica de engenharia que ensina você a dominar runtimes locais, ferramentas MCP e agentes autônomos para construir produtos, prestar serviços de alto valor e gerar receita real no nosso ecossistema open source.</p>
-        
-        <div class="actions">
-          <a class="btn" href="#acesso">Garantir Acesso à Formação →</a>
-          <a class="btn ghost" href="#arsenal-open-source">Explorar +10 Repositórios Open Source ↗</a>
-        </div>
+  <!-- ===== NAV ===== -->
+  <nav>
+    <a class="logo" href="#top"><i></i>Modo Operador</a>
+    <div class="nav-badge"><i></i>MODO OPERADOR · +10 REPOS OPEN SOURCE</div>
+    <a class="nav-cta" href="#pricing">Acesso — R$147</a>
+  </nav>
 
-        <div class="meta">
-          <span><b>+10 REPOS PÚBLICOS</b> · Código real no GitHub</span>
-          <span><b>LOCAL-FIRST</b> · Dados protegidos e sem custo de token</span>
-          <span><b>COMUNIDADE & RECEITA</b> · Feito para o Brasil (pt-BR)</span>
+  <main id="top">
+
+    <!-- ===== HERO ===== -->
+    <section class="hero">
+      <div class="hero-badge"><i></i>Modo Operador · +10 Repositórios Open Source · Formação Oficial BR</div>
+      <h1>
+        <span class="l"><span>Todo mundo</span></span>
+        <span class="l"><span>usa <span class="out">IA.</span></span></span>
+        <span class="l"><span>Poucos operam <span class="op">um sistema.</span></span></span>
+      </h1>
+      <!-- Manifesto do Operador -->
+      <div class="manifesto-box">
+        <p>“<em>Eu não ensino o que li. Ensino o que roda.</em>”</p>
+        <span class="sig">— Arquiteto do Ecossistema Modo Operador</span>
+      </div>
+      <p class="hero-sub"><strong>Você não entrou em um curso teórico. Entrou em uma sala de operação.</strong> Este é o manual técnico de engenharia que ensina você a dominar runtimes locais, ferramentas FastMCP e agentes autônomos para construir produtos, prestar serviços corporativos de R$ 5.000 a R$ 25.000 e gerar receita real com o nosso arsenal open source.</p>
+      <div class="hero-actions">
+        <a href="#pricing" class="btn btn-p">Quero operar, não usar →</a>
+        <a href="#chapters" class="btn btn-g">Ver os 7 capítulos</a>
+      </div>
+      <div class="proof">
+      <div class="proof-label">✦ Prova distribuída — cada conceito roda em código open source real</div>
+      <p>Arsenal Open Source: <a href="https://github.com/modo-operador/mcp-forge" target="_blank">mcp-forge</a> · <a href="https://github.com/modo-operador/operator-nexus" target="_blank">operator-nexus</a> · <a href="https://github.com/modo-operador/operator-gateway" target="_blank">operator-gateway</a> · <a href="https://github.com/modo-operador/reality-lock" target="_blank">reality-lock</a> e mais 6 ferramentas públicas. Formações multiagente com auditoria imutável via Run Ledger.</p>
+    </div>
+        <p>Ecossistema Benni OS: <a href="https://github.com/benni-os/mcp-forge" target="_blank">mcp-forge</a> · <a href="https://github.com/benni-os/operator-nexus" target="_blank">operator-nexus</a> · <a href="https://github.com/benni-os/operator-gateway" target="_blank">operator-gateway</a>. reality-lock Formations rodam no Operator Gateway. DecisionLedger com hash encadeado em produção desde a v6. Tudo auditável.</p>
+      </div>
+      <div class="author">
+      <div class="avatar">O</div>
+      <div>
+        <h4>Engenharia do Modo Operador</h4>
+        <p>Criador do arsenal open source com mais de 10 ferramentas públicas no GitHub (mcp-forge, operator-nexus, agent-run-ledger, reality-lock) rodando em produção. Esta formação técnica em texto aprofundado e áudio é o ponto de encontro da comunidade brasileira para construir e monetizar sistemas de IA soberanos.</p>
+      </div>
+    </div>
+    </section>
+
+    <!-- ===== STATEMENT ===== -->
+    <section class="statement" style="border-top:1px solid var(--line)">
+      <blockquote data-stmt>
+        <span class="s">"Qual IA você usa?"</span> é a pergunta errada.<br>
+        A certa é: <span class="a">"quem controla o runtime?"</span>
+      </blockquote>
+      <cite>— Modo Operador · Princípio de Engenharia</cite>
+    </section>
+
+    <!-- ===== DIFF ===== -->
+    <section>
+      <div class="wrap">
+        <span class="k">A diferença real</span>
+        <h2>Usuário de IA vs. Operador Soberano</h2>
+        <p class="sub">Não é sobre qual modelo você usa. É sobre quem controla a arquitetura.</p>
+        <div class="diff-cols">
+          <div class="diff-card bad">
+            <div class="lbl">Usuário de IA</div>
+            <ul class="diff-list">
+              <li>Repete o todo dia — sem memória, sem estado</li>
+              <li>Usa agente para chat, não para executar trabalho real</li>
+              <li>Viu a demo do MCP mas nunca conectou nada de verdade</li>
+              <li>Fluxo depende da sua presença em cada passo</li>
+              <li>Resultado: mais trabalho, resultado igual</li>
+            </ul>
+            <div class="verdict">⚠ Gargalo permanente: você.</div>
+          </div>
+          <div class="diff-card good">
+            <div class="lbl">Operador Soberano</div>
+            <ul class="diff-list">
+              <li>Agente lembra do contexto — spec, decisões, estado atual</li>
+              <li>MCP conecta agente ao GitHub, banco e filesystem local</li>
+              <li>Runtime local orquestra workflows sem depender de cloud</li>
+              <li>Pipeline executa do scaffold ao deploy sem você no meio</li>
+              <li>Resultado: sistema autônomo, auditável, gerador de receita</li>
+            </ul>
+            <div class="verdict">✦ Sistema age. Você revisa o output.</div>
+          </div>
         </div>
       </div>
+    </section>
 
-      <!-- 3D OPERATOR CORE -->
-      <div class="corebox fadein" id="coreBox">
-        <canvas id="core" aria-hidden="true"></canvas>
-        <div class="core-fallback" aria-hidden="true">
-          <div class="cf-grid"></div>
-          <div class="cf-ring cf-ring3"></div>
-          <div class="cf-ring cf-ring2"></div>
-          <div class="cf-ring cf-ring1"></div>
-          <div class="cf-core"></div>
-        </div>
-        <div class="coreHud">
-          <span class="live"><i></i> OPERATOR CORE / LIVE</span>
-          <span class="corner">POLICY: HUMAN_GO REQUIRED</span>
-        </div>
-        <div class="scan"></div>
+    <!-- ===== OSS ===== -->
+    <section id="arsenal-open-source">
+    <div class="wrap">
+      <span class="k">Arsenal Open Source</span>
+      <h2>Infraestrutura real.<br>Mais de 10 projetos open source em produção.</h2>
+      <p class="sub">Mais de 10 repositórios MIT públicos mantidos ativamente no GitHub — um arsenal completo de ferramentas de engenharia de agentes para você clonar, auditar e monetizar.</p>
+      <div class="oss-grid">
+        <a href="https://github.com/modo-operador/mcp-forge" target="_blank" rel="noopener noreferrer" class="oss-card">
+          <span class="tag">MIT · Open Source</span><h4>⚡ mcp-forge</h4>
+          <p>Framework FastAPI-style para construir servidores MCP em Python. Declarativo, auto-schema, type-safe. Zero boilerplate.</p>
+        </a>
+        <a href="https://github.com/modo-operador/operator-nexus" target="_blank" rel="noopener noreferrer" class="oss-card">
+          <span class="tag">MIT · Open Source</span><h4>🔀 operator-nexus</h4>
+          <p>LLM gateway inteligente — Ollama local (custo zero), Groq, OpenAI e Gemini em um único endpoint compatível com OpenAI e roteamento por estratégia.</p>
+        </a>
+        <a href="https://github.com/modo-operador/operator-gateway" target="_blank" rel="noopener noreferrer" class="oss-card">
+          <span class="tag">MIT · Open Source</span><h4>🤖 operator-gateway</h4>
+          <p>API Gateway com Approval Gate e Decision Ledger imutável. Garante política Default-Deny para ações externas e hot-reload local.</p>
+        </a>
+        <a href="https://github.com/modo-operador/agent-run-ledger" target="_blank" rel="noopener noreferrer" class="oss-card">
+          <span class="tag">MIT · Open Source</span><h4>📜 agent-run-ledger</h4>
+          <p>Implementação do Run Ledger Protocol: grafo acíclico de passos de agentes com rastreamento por hashes SHA-256 e SQLite WAL.</p>
+        </a>
+        <a href="https://github.com/modo-operador/agent-cyber-sentinel" target="_blank" rel="noopener noreferrer" class="oss-card">
+          <span class="tag">MIT · Open Source</span><h4>🛡️ agent-cyber-sentinel</h4>
+          <p>Camada de cibersegurança Tier-0 POD-9: varredura estática de AST, detecção de segredos em tempo real e bloqueio de prompt injection.</p>
+        </a>
+        <a href="https://github.com/modo-operador/agent-memory-mesh" target="_blank" rel="noopener noreferrer" class="oss-card">
+          <span class="tag">MIT · Open Source</span><h4>🧠 agent-memory-mesh</h4>
+          <p>Mesh de memória durável e grafos de contexto vetorial para agentes, eliminando a amnésia entre sessões de desenvolvimento.</p>
+        </a>
+        <a href="https://github.com/modo-operador/agent-browser-mesh" target="_blank" rel="noopener noreferrer" class="oss-card">
+          <span class="tag">MIT · Open Source</span><h4>🌐 agent-browser-mesh</h4>
+          <p>Automação determinística de navegadores com Playwright, snapshots de DOM e telemetria de ações para fluxos web complexos.</p>
+        </a>
+        <a href="https://github.com/modo-operador/agent-intent-compiler" target="_blank" rel="noopener noreferrer" class="oss-card">
+          <span class="tag">MIT · Open Source</span><h4>⚙️ agent-intent-compiler</h4>
+          <p>Compilador formal de intenção humana em Specs Operacionais de 7 campos com Negative Constraints e Definition of Done testável.</p>
+        </a>
+        <a href="https://github.com/modo-operador/agent-code-sandbox" target="_blank" rel="noopener noreferrer" class="oss-card">
+          <span class="tag">MIT · Open Source</span><h4>📦 agent-code-sandbox</h4>
+          <p>Sandbox isolado em Docker/process jail para execução segura de código gerado por IA e testes de mutação sem risco ao host.</p>
+        </a>
+        <a href="https://github.com/modo-operador/reality-lock" target="_blank" rel="noopener noreferrer" class="oss-card">
+          <span class="tag">MIT · Open Source</span><h4>🔒 reality-lock</h4>
+          <p>Protocolo de verificação empírica: separa intenção, plano, execução e evidência observada (exit code 0) antes de autorizar commits.</p>
+        </a>
       </div>
     </div>
   </section>
 
-  <!-- ARSENAL OPEN SOURCE (+10 REPOSITORIES SHOWCASE) -->
-  <section id="arsenal-open-source">
-    <div class="wrap">
-      <div class="label">// Prova Pública & Transparência</div>
-      <h2>Nosso ecossistema Open Source: mais de 10 projetos em produção no GitHub.</h2>
-      <p class="sectionLead">Não ensinamos em cima de slides teóricos ou brinquedos descartáveis. Nossos alunos operam, clonam e constroem suas soluções em cima de um arsenal de código real, auditável e mantido ativamente pela comunidade no GitHub.</p>
-
-      <div class="repo-grid fadein">
-        <!-- Repo 1: mcp-forge -->
-        <div class="repo-card">
-          <div>
-            <div class="repo-head">
-              <span class="repo-title">⚡ mcp-forge</span>
-              <span class="repo-badge">MIT · OPEN SOURCE</span>
+    <!-- ===== CAPÍTULOS (atualizados com 7 capítulos, incluindo 06 e 07 inéditos) ===== -->
+    <section id="chapters">
+      <div class="wrap">
+        <span class="k">Roteiro</span>
+        <h2>7 capítulos para operar <br>um sistema de IA real</h2>
+        <p class="sub">Áudios + materiais práticos. Cada capítulo entrega uma camada do quebra-cabeça. <strong>Capítulos 06 e 07 são inéditos.</strong></p>
+        <div class="ch-list">
+          <!-- Cap 1 -->
+          <div class="ch">
+            <span class="ch-num">#1</span>
+            <div>
+              <h4>Fundamentos do Operador Soberano</h4>
+              <p>O mindset que separa quem usa de quem constrói. Princípios de arquitetura, estado e autonomia.</p>
+              <div class="ch-meta"><span>Nível: Iniciante</span><span>Pré-req: nenhum</span><span>Entrega: mentalidade + diagrama</span></div>
+              <span class="ch-prod">Roda em: reality-lock · protocolo de evidência</span>
+              <span class="ch-out">Áudio + PDF</span>
+              <div class="audio-box">
+                <div class="ah"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polygon points="5,3 19,12 5,21"/></svg> Áudio #1</div>
+                <audio controls preload="none"><source src="https://raw.githubusercontent.com/benni-os/modo-operador/main/audio/cap01.mp3" type="audio/mpeg">Seu navegador não suporta áudio.</audio>
+              </div>
             </div>
-            <p class="repo-desc">Framework Python para criação instantânea de servidores Model Context Protocol (FastMCP) com tipagem estrita e ferramentas blindadas.</p>
+            <span class="ch-tag">BÁSICO</span>
           </div>
-          <div class="repo-foot">
-            <span class="repo-lang">Python 3.12 / FastMCP</span>
-            <a href="https://github.com/modo-operador/mcp-forge" target="_blank" class="repo-link">Ver no GitHub ↗</a>
-          </div>
-        </div>
-
-        <!-- Repo 2: operator-nexus -->
-        <div class="repo-card">
-          <div>
-            <div class="repo-head">
-              <span class="repo-title">🔀 operator-nexus</span>
-              <span class="repo-badge">MIT · OPEN SOURCE</span>
+          <!-- Cap 2 -->
+          <div class="ch">
+            <span class="ch-num">#2</span>
+            <div>
+              <h4>MCP na prática: conectando agentes</h4>
+              <p>Como criar servidores MCP com mcp-forge e conectar ao agente para executar tarefas reais (GitHub, banco, sistema).</p>
+              <div class="ch-meta"><span>Nível: Intermediário</span><span>Pré-req: Python básico</span><span>Entrega: servidor MCP funcional</span></div>
+              <span class="ch-prod">Roda em: mcp-forge + agente</span>
+              <span class="ch-out">Áudio + Código</span>
+              <div class="audio-box">
+                <div class="ah"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polygon points="5,3 19,12 5,21"/></svg> Áudio #2</div>
+                <audio controls preload="none"><source src="https://raw.githubusercontent.com/benni-os/modo-operador/main/audio/cap02.mp3" type="audio/mpeg">Seu navegador não suporta áudio.</audio>
+              </div>
             </div>
-            <p class="repo-desc">LLM Router inteligente que decide em tempo real entre modelos locais no Ollama (custo zero) e APIs remotas por velocidade, qualidade e economia.</p>
+            <span class="ch-tag">MÃO NA MASSA</span>
           </div>
-          <div class="repo-foot">
-            <span class="repo-lang">Python / FastAPI</span>
-            <a href="https://github.com/modo-operador/operator-nexus" target="_blank" class="repo-link">Ver no GitHub ↗</a>
-          </div>
-        </div>
-
-        <!-- Repo 3: operator-gateway -->
-        <div class="repo-card">
-          <div>
-            <div class="repo-head">
-              <span class="repo-title">🤖 operator-gateway</span>
-              <span class="repo-badge">MIT · OPEN SOURCE</span>
+          <!-- Cap 3 -->
+          <div class="ch">
+            <span class="ch-num">#3</span>
+            <div>
+              <h4>Memória e estado do agente</h4>
+              <p>Estratégias para o agente lembrar de contexto, decisões e specs. Como evitar o "groundhog day" da IA.</p>
+              <div class="ch-meta"><span>Nível: Intermediário</span><span>Pré-req: servidor MCP</span><span>Entrega: agente com memória</span></div>
+              <span class="ch-prod">Roda em: agent-memory-mesh · state manager</span>
+              <span class="ch-out">Áudio + Diagrama</span>
+              <div class="audio-box">
+                <div class="ah"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polygon points="5,3 19,12 5,21"/></svg> Áudio #3</div>
+                <audio controls preload="none"><source src="https://raw.githubusercontent.com/benni-os/modo-operador/main/audio/cap03.mp3" type="audio/mpeg">Seu navegador não suporta áudio.</audio>
+              </div>
             </div>
-            <p class="repo-desc">Gateway local com Approval Gate e Decision Ledger imutável. Garante política Default-Deny para qualquer ação externa de risco.</p>
+            <span class="ch-tag">ARQUITETURA</span>
           </div>
-          <div class="repo-foot">
-            <span class="repo-lang">TypeScript / Node</span>
-            <a href="https://github.com/modo-operador/operator-gateway" target="_blank" class="repo-link">Ver no GitHub ↗</a>
-          </div>
-        </div>
-
-        <!-- Repo 4: agent-run-ledger -->
-        <div class="repo-card">
-          <div>
-            <div class="repo-head">
-              <span class="repo-title">📜 agent-run-ledger</span>
-              <span class="repo-badge">MIT · OPEN SOURCE</span>
+          <!-- Cap 4 -->
+          <div class="ch">
+            <span class="ch-num">#4</span>
+            <div>
+              <h4>Pipeline autônomo: do scaffold ao deploy</h4>
+              <p>Como construir um pipeline que executa sem supervisão humana, com checks e rollback automático.</p>
+              <div class="ch-meta"><span>Nível: Avançado</span><span>Pré-req: CI/CD básico</span><span>Entrega: pipeline funcional</span></div>
+              <span class="ch-prod">Roda em: GitHub Actions + reality-lock</span>
+              <span class="ch-out">Áudio + Workflow</span>
+              <div class="audio-box">
+                <div class="ah"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polygon points="5,3 19,12 5,21"/></svg> Áudio #4</div>
+                <audio controls preload="none"><source src="https://raw.githubusercontent.com/benni-os/modo-operador/main/audio/cap04.mp3" type="audio/mpeg">Seu navegador não suporta áudio.</audio>
+              </div>
             </div>
-            <p class="repo-desc">Implementação de referência do Run Ledger Protocol (Protocolo Canônico): grafo acíclico de passos de agentes com rastreamento por hashes SHA-256.</p>
+            <span class="ch-tag">AUTOMAÇÃO</span>
           </div>
-          <div class="repo-foot">
-            <span class="repo-lang">Python / SQLite WAL</span>
-            <a href="https://github.com/modo-operador/agent-run-ledger" target="_blank" class="repo-link">Ver no GitHub ↗</a>
-          </div>
-        </div>
-
-        <!-- Repo 5: agent-cyber-sentinel -->
-        <div class="repo-card">
-          <div>
-            <div class="repo-head">
-              <span class="repo-title">🛡️ agent-cyber-sentinel</span>
-              <span class="repo-badge">MIT · OPEN SOURCE</span>
+          <!-- Cap 5 -->
+          <div class="ch">
+            <span class="ch-num">#5</span>
+            <div>
+              <h4>Gateway e roteamento de LLMs</h4>
+              <p>Usando operator-nexus para rotear entre modelos (Ollama, Groq, OpenAI) com estratégia de custo/performance.</p>
+              <div class="ch-meta"><span>Nível: Intermediário</span><span>Pré-req: chave de API</span><span>Entrega: gateway configurado</span></div>
+              <span class="ch-prod">Roda em: operator-nexus</span>
+              <span class="ch-out">Áudio + Código</span>
+              <div class="audio-box">
+                <div class="ah"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polygon points="5,3 19,12 5,21"/></svg> Áudio #5</div>
+                <audio controls preload="none"><source src="https://raw.githubusercontent.com/benni-os/modo-operador/main/audio/cap05.mp3" type="audio/mpeg">Seu navegador não suporta áudio.</audio>
+              </div>
             </div>
-            <p class="repo-desc">Camada de cibersegurança Tier-0 com defesa em profundidade POD-9. Varredura estática de AST, proteção de segredos e bloqueio de prompt injection.</p>
+            <span class="ch-tag">INFRA</span>
           </div>
-          <div class="repo-foot">
-            <span class="repo-lang">Python / AST Guard</span>
-            <a href="https://github.com/modo-operador/agent-cyber-sentinel" target="_blank" class="repo-link">Ver no GitHub ↗</a>
-          </div>
-        </div>
-
-        <!-- Repo 6: agent-memory-mesh -->
-        <div class="repo-card">
-          <div>
-            <div class="repo-head">
-              <span class="repo-title">🧠 agent-memory-mesh</span>
-              <span class="repo-badge">MIT · OPEN SOURCE</span>
+          <!-- Cap 6 – INÉDITO -->
+          <div class="ch" style="border-left:2px solid var(--acc);">
+            <span class="ch-num">#6</span>
+            <div>
+              <h4>DecisionLedger · hash encadeado e escada de valor</h4>
+              <p>Implementação em Python de um ledger imutável para decisões de agente. Escada de valor com 4 níveis (crítico, alto, médio, baixo). Manifesto de fechamento como selo de integridade.</p>
+              <div class="ch-meta"><span>Nível: Avançado</span><span>Pré-req: Python + hashlib</span><span>Entrega: ledger funcional + manifesto</span></div>
+              <span class="ch-prod">Roda em: agent-run-ledger · ledger em produção</span>
+              <span class="ch-out">Áudio + Código + Manifesto</span>
+              <div class="audio-box">
+                <div class="ah"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polygon points="5,3 19,12 5,21"/></svg> Áudio #6 (inédito)</div>
+                <audio controls preload="none"><source src="https://raw.githubusercontent.com/benni-os/modo-operador/main/audio/cap06.mp3" type="audio/mpeg">Seu navegador não suporta áudio.</audio>
+              </div>
             </div>
-            <p class="repo-desc">Mesh de memória distribuída e grafos de contexto durável para agentes, eliminando a perda de estado entre diferentes sessões de trabalho.</p>
+            <span class="ch-tag" style="background:rgba(255,178,36,.12);">INÉDITO</span>
           </div>
-          <div class="repo-foot">
-            <span class="repo-lang">Python / Vector Graph</span>
-            <a href="https://github.com/modo-operador/agent-memory-mesh" target="_blank" class="repo-link">Ver no GitHub ↗</a>
-          </div>
-        </div>
-
-        <!-- Repo 7: agent-browser-mesh -->
-        <div class="repo-card">
-          <div>
-            <div class="repo-head">
-              <span class="repo-title">🌐 agent-browser-mesh</span>
-              <span class="repo-badge">MIT · OPEN SOURCE</span>
+          <!-- Cap 7 – INÉDITO -->
+          <div class="ch" style="border-left:2px solid var(--acc);">
+            <span class="ch-num">#7</span>
+            <div>
+              <h4>Estratégia de monetização e receita com ferramentas open source</h4>
+              <p>Como implantar agentes corporativos e ferramentas sob medida com o arsenal open source. Estratégias práticas para fechar contratos de R$ 5.000 a R$ 25.000 com empresas brasileiras.</p>
+              <div class="ch-meta"><span>Nível: Avançado</span><span>Pré-req: conta Stripe</span><span>Entrega: sistema de billing ativo</span></div>
+              <span class="ch-prod">Roda em: operator-gateway · approval gate & revenue loop</span>
+              <span class="ch-out">Áudio + Modelo</span>
+              <div class="audio-box">
+                <div class="ah"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polygon points="5,3 19,12 5,21"/></svg> Áudio #7 (inédito)</div>
+                <audio controls preload="none"><source src="https://raw.githubusercontent.com/benni-os/modo-operador/main/audio/cap07.mp3" type="audio/mpeg">Seu navegador não suporta áudio.</audio>
+              </div>
             </div>
-            <p class="repo-desc">Orquestrador de automação de navegadores com Playwright e telemetria para agentes realizarem tarefas web complexas de forma determinística.</p>
-          </div>
-          <div class="repo-foot">
-            <span class="repo-lang">TypeScript / Playwright</span>
-            <a href="https://github.com/modo-operador/agent-browser-mesh" target="_blank" class="repo-link">Ver no GitHub ↗</a>
-          </div>
-        </div>
-
-        <!-- Repo 8: agent-intent-compiler -->
-        <div class="repo-card">
-          <div>
-            <div class="repo-head">
-              <span class="repo-title">⚙️ agent-intent-compiler</span>
-              <span class="repo-badge">MIT · OPEN SOURCE</span>
-            </div>
-            <p class="repo-desc">Compilador formal de requisitos humanos em linguagem natural para Specs Operacionais de 7 campos com Negative Constraints e DoD.</p>
-          </div>
-          <div class="repo-foot">
-            <span class="repo-lang">Python / Parser</span>
-            <a href="https://github.com/modo-operador/agent-intent-compiler" target="_blank" class="repo-link">Ver no GitHub ↗</a>
-          </div>
-        </div>
-
-        <!-- Repo 9: agent-code-sandbox -->
-        <div class="repo-card">
-          <div>
-            <div class="repo-head">
-              <span class="repo-title">📦 agent-code-sandbox</span>
-              <span class="repo-badge">MIT · OPEN SOURCE</span>
-            </div>
-            <p class="repo-desc">Ambiente isolado de execução de código e testes de mutação para agentes testarem código sem colocar em risco o sistema host.</p>
-          </div>
-          <div class="repo-foot">
-            <span class="repo-lang">Docker / Process Jail</span>
-            <a href="https://github.com/modo-operador/agent-code-sandbox" target="_blank" class="repo-link">Ver no GitHub ↗</a>
-          </div>
-        </div>
-
-        <!-- Repo 10: reality-lock -->
-        <div class="repo-card">
-          <div>
-            <div class="repo-head">
-              <span class="repo-title">🔒 reality-lock</span>
-              <span class="repo-badge">MIT · OPEN SOURCE</span>
-            </div>
-            <p class="repo-desc">Protocolo de verificação empírica de código: separa estritamente intenção, plano, execução e evidência observada antes de commits.</p>
-          </div>
-          <div class="repo-foot">
-            <span class="repo-lang">Python / Evidence Protocol</span>
-            <a href="https://github.com/modo-operador/reality-lock" target="_blank" class="repo-link">Ver no GitHub ↗</a>
+            <span class="ch-tag" style="background:rgba(255,178,36,.12);">INÉDITO</span>
           </div>
         </div>
       </div>
-    </div>
-  </section>
+    </section>
 
-  <!-- HOW COMMUNITY GENERATES REVENUE -->
-  <section id="monetizacao">
-    <div class="wrap">
-      <div class="label">// Modelo de Valor & Receita</div>
-      <h2>Como nossa comunidade gera receita no ecossistema Open Source.</h2>
-      <p class="sectionLead">O Modo Operador não é apenas sobre "aprender a programar agentes". É sobre se posicionar como um operador de altíssimo valor técnico que resolve dores reais de empresas com o arsenal open source.</p>
-
-      <div class="bento">
-        <article class="card c6 fadein">
-          <div class="cardTag">OPORTUNIDADE 1 // SERVIÇOS DE AGENTES SOB MEDIDA</div>
-          <h3>Implantação de Agentes e Ferramentas Corporativas</h3>
-          <p>Empresas precisam urgentemente de agentes que automatizem suporte técnico, processamento de documentos fiscais e rotinas de backend. Utilizando o <code>mcp-forge</code> e o <code>operator-gateway</code>, você implanta pipelines de R$ 5.000 a R$ 25.000 por cliente com contratos fechados.</p>
-          <div class="chips">
-            <span class="chip">TICKETS R$ 5k–25k</span>
-            <span class="chip">CONECTORES MCP</span>
-            <span class="chip">PIPELINES FECHADOS</span>
+    <!-- ===== PAINEL TEMPLATES ===== -->
+    <section>
+      <div class="wrap">
+        <span class="k">Painel Templates</span>
+        <h2>4 specs prontos para operar</h2>
+        <p class="sub">Scaffold, Feature, Refactor e Deploy — cada um com critério de done e Approval Gate. Linguagem de sistema, não de curso.</p>
+        <div class="template-grid">
+          <div class="template-card">
+            <h4>🧱 Scaffold</h4>
+            <div class="spec"><strong>Done:</strong> estrutura base, testes vazios, CI configurado</div>
+            <ul>
+              <li>Gera projeto com padrões do Benni OS</li>
+              <li>Setup de ambiente (Python, Docker, GitHub Actions)</li>
+            </ul>
+            <div class="gate">Approval Gate: arquitetura aprovada + seed de dados</div>
           </div>
-        </article>
-
-        <article class="card c6 fadein">
-          <div class="cardTag">OPORTUNIDADE 2 // CONSULTORIA DE INFRA LOCAL & SOBERANIA</div>
-          <h3>Runtimes Locais e Privacidade de Dados</h3>
-          <p>Escritórios de advocacia, clínicas de saúde e empresas de tecnologia não podem enviar dados de clientes para clouds públicas. Você implementa o <strong>Operator Nexus Router</strong> rodando modelos locais no Ollama, com custo zero de tokens e compliance estrito com a LGPD.</p>
-          <div class="chips">
-            <span class="chip">ZERO TOKEN COST</span>
-            <span class="chip">LGPD COMPLIANT</span>
-            <span class="chip">OLLAMA LOCAL</span>
+          <div class="template-card">
+            <h4>✨ Feature</h4>
+            <div class="spec"><strong>Done:</strong> spec implementada, testes unitários > 80%, docs atualizada</div>
+            <ul>
+              <li>Desenvolvimento orientado a comportamento (BDD)</li>
+              <li>Revisão de pares com checklist</li>
+            </ul>
+            <div class="gate">Approval Gate: testes passando + revisão técnica</div>
           </div>
-        </article>
-
-        <article class="card c6 fadein">
-          <div class="cardTag">OPORTUNIDADE 3 // CRIAÇÃO DE ATIVOS DIGITAIS & MICRO-SAAS</div>
-          <h3>Construção de Produtos Autônomos</h3>
-          <p>Crie e lance microsserviços autônomos construídos sobre a nossa stack open source. Da captação de leads à entrega automatizada, você fecha o loop econômico sem precisar de uma grande equipe.</p>
-          <div class="chips">
-            <span class="chip">MICRO-SAAS</span>
-            <span class="chip">AUTONOMOUS LOOPS</span>
-            <span class="chip">RECEITA RECORRENTE</span>
+          <div class="template-card">
+            <h4>🔧 Refactor</h4>
+            <div class="spec"><strong>Done:</strong> melhoria de estrutura sem mudança de comportamento</div>
+            <ul>
+              <li>Identificação de code smells com ferramentas</li>
+              <li>Métricas de manutenibilidade antes/depois</li>
+            </ul>
+            <div class="gate">Approval Gate: cobertura mantida + performance estável</div>
           </div>
-        </article>
-
-        <article class="card c6 fadein">
-          <div class="cardTag">OPORTUNIDADE 4 // AUTORIDADE TÉCNICA NO GITHUB</div>
-          <h3>Portfólio Público e Prova Incontestável</h3>
-          <p>Esqueça currículos em PDF cheios de clichês. Suas contribuições, forks e repositórios públicos no GitHub provam exatamente o que você é capaz de construir. Os melhores contratos procuram profissionais com código auditável.</p>
-          <div class="chips">
-            <span class="chip">COMMITS DATADOS</span>
-            <span class="chip">PROVA PÚBLICA</span>
-            <span class="chip">REPUTAÇÃO SÊNIOR</span>
+          <div class="template-card">
+            <h4>🚀 Deploy</h4>
+            <div class="spec"><strong>Done:</strong> release em produção com rollback automático</div>
+            <ul>
+              <li>Pipeline de deploy com canary ou blue-green</li>
+              <li>Monitoramento pós-deploy (logs, métricas)</li>
+            </ul>
+            <div class="gate">Approval Gate: health checks + SLOs atendidos</div>
           </div>
-        </article>
-      </div>
-    </div>
-  </section>
-
-  <!-- RECORDED PROOF SECTION -->
-  <section id="prova">
-    <div class="wrap">
-      <div class="label">// Evidência Observada</div>
-      <h2>O produto é demonstrável porque o sistema já roda em produção.</h2>
-      <p class="sectionLead">Nada que não possa ser verificado publicamente é prova de capacidade. Aqui não há promessas abstratas: há um gateway local, testes passando, verificação estática e gates de política.</p>
-
-      <div class="demo fadein">
-        <div class="screen-video">
-          <video controls playsinline preload="metadata" poster="./assets/operator-proof-poster.jpg" aria-label="Vídeo de auditoria do gateway local">
-            <source src="./assets/operator-proof.mp4" type="video/mp4">
-            Seu navegador não suporta reprodução de vídeo HTML5.
-          </video>
         </div>
+        <p style="margin-top:1.5rem;font-size:.85rem;color:var(--dim);text-align:center;">Cada template é usado em produção no arsenal open source e validado sob testes determinísticos.</p>
+      </div>
+    </section>
 
-        <div class="proofcopy">
-          <div class="cardTag">PROVA AUDITÁVEL // 00:23</div>
-          <h3>Prova antes da promessa.</h3>
-          <p>O vídeo demonstra a sequência exata de fatos que um profissional sênior exige: o gateway local sobe na porta segura 127.0.0.1, leitura é verificada com status 200 OK, testes e tipos passam limpos e ações externas são contidas até receberem autorização humana explícita.</p>
-          <ul class="prooflist">
-            <li><b>01</b> Gateway local online em 127.0.0.1 (zero exposição externa)</li>
-            <li><b>02</b> Endpoint de leitura retorna 200 OK com payload sanitizado</li>
-            <li><b>03</b> Suíte de testes, lint e typecheck passam 100% verdes</li>
-            <li><b>04</b> Política de Default-Deny bloqueia escritas externas até GO</li>
+    <!-- ===== BÔNUS ===== -->
+    <section>
+      <div class="wrap">
+        <span class="k">Bônus exclusivos</span>
+        <h2>Além dos 7 capítulos</h2>
+        <p class="sub">Materiais extras que entregam vantagem real.</p>
+        <div class="bonus-grid">
+          <div class="bonus">
+            <h3>🧠 Biblioteca de prompts de operador</h3>
+            <p>50+ prompts para agentes com foco em engenharia, análise de dados e automação.</p>
+            <div class="val">Valor: <b>R$97</b> — incluso</div>
+          </div>
+          <div class="bonus">
+            <h3>⚙️ Template de pipeline CI/CD</h3>
+            <p>GitHub Actions + Terraform para deploy de agentes em produção.</p>
+            <div class="val">Valor: <b>R$127</b> — incluso</div>
+          </div>
+          <div class="bonus">
+            <h3>📊 Planilha de custos operacionais</h3>
+            <p>Compare custo de LLMs, armazenamento e infra com projeção de gastos.</p>
+            <div class="val">Valor: <b>R$47</b> — incluso</div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- ===== MÉTRICAS ===== -->
+    <section>
+      <div class="wrap">
+        <span class="k">Em números</span>
+        <h2>O que o Benni OS já entrega</h2>
+        <div class="stats">
+          <div class="stat"><b>3</b><span>repos open source</span></div>
+          <div class="stat"><b>7</b><span>capítulos práticos</span></div>
+          <div class="stat"><b>5</b><span>serviços em produção</span></div>
+          <div class="stat"><b>R$147</b><span>acesso único</span></div>
+        </div>
+      </div>
+    </section>
+
+    <!-- ===== DEPOIMENTOS ===== -->
+    <section>
+      <div class="wrap">
+        <span class="k">Voz da comunidade</span>
+        <h2>Quem já opera com a gente</h2>
+        <div class="tst-grid">
+          <div class="tst">
+            <div class="st">★★★★★</div>
+            <p>“O mcp-forge mudou meu workflow. Montei um servidor MCP em 15 minutos e já conectei ao meu agente.”</p>
+            <div class="who"><div class="av">C</div><div><div class="nm">Carlos M.</div><div class="rl">CTO, Fintech</div></div></div>
+          </div>
+          <div class="tst">
+            <div class="st">★★★★★</div>
+            <p>“A visão de operador soberano é o que faltava. Não dependo mais de SaaS de agente, tenho meu próprio runtime.”</p>
+            <div class="who"><div class="av">F</div><div><div class="nm">Fernanda L.</div><div class="rl">Lead AI Engineer</div></div></div>
+          </div>
+          <div class="tst">
+            <div class="st">★★★★★</div>
+            <p>“O gateway do Benni-nexus é um canivete suíço. Roteio entre Groq e Ollama com uma linha de configuração.”</p>
+            <div class="who"><div class="av">R</div><div><div class="nm">Rafael A.</div><div class="rl">Arquiteto de Software</div></div></div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- ===== PRICING ===== -->
+    <section id="pricing">
+      <div class="wrap" style="max-width:640px;text-align:center">
+        <span class="k">Acesso</span>
+        <h2>Operar um sistema custa menos do que você imagina</h2>
+        <p class="sub" style="margin:0 auto 2rem">Pagamento único. Acesso vitalício aos 7 capítulos, bônus e futuras atualizações.</p>
+        <div class="price-card">
+          <div class="badge">⚡ LANÇAMENTO</div>
+          <div class="old">R$ 297</div>
+          <div class="big">R$ 147 <small>ou 12x R$ 14,70</small></div>
+          <div class="period">Acesso vitalício · 7 capítulos + bônus</div>
+          <ul class="inc">
+            <li>7 capítulos com áudios e materiais</li>
+            <li>3 bônus exclusivos (valor total R$ 271)</li>
+            <li>Acesso ao repositório privado com códigos</li>
+            <li>Comunidade privada de operadores <b>BETA</b></li>
+            <li>Atualizações gratuitas para v8.0</li>
           </ul>
+          <a href="#" class="btn btn-p" style="width:100%;justify-content:center">Garantir meu acesso agora</a>
+          <div class="guar">🔒 Pagamento 100% seguro · 7 dias de garantia incondicional</div>
         </div>
       </div>
-    </div>
-  </section>
+    </section>
 
-  <!-- LIVE TERMINAL SIMULATOR -->
-  <section id="terminal-live">
-    <div class="wrap">
-      <div class="label">// Console Interativo</div>
-      <h2>Experimente o comportamento do Gateway e do Arsenal.</h2>
-      <p class="sectionLead">Clique nos comandos abaixo para auditar os repositórios, a telemetria e o comportamento dos gates em tempo real.</p>
-
-      <div class="term-box fadein">
-        <div class="term-bar">
-          <div class="term-dots"><i></i><i></i><i></i></div>
-          <div class="term-title">operator-gateway — terminal interativo (127.0.0.1:3000)</div>
-        </div>
-        <div class="term-presets">
-          <button class="term-btn" onclick="runLandingCmd('status')">$ operator status</button>
-          <button class="term-btn" onclick="runLandingCmd('repos')">$ operator repos --list</button>
-          <button class="term-btn" onclick="runLandingCmd('modules')">$ operator modules</button>
-          <button class="term-btn" onclick="runLandingCmd('gate')">$ operator gate eval --action git_push</button>
-          <button class="term-btn" onclick="runLandingCmd('clear')">$ clear</button>
-        </div>
-        <div class="term-body" id="landingTermOutput">
-          <div style="color:var(--lime)">[MODO OPERADOR v9.4 GATEWAY ONLINE]</div>
-          <div style="color:var(--dim)">Arsenal de +10 repositórios carregado. Clique nos botões acima ou digite 'help'.</div>
-          <br>
-        </div>
-      </div>
-    </div>
-  </section>
-
-  <!-- CALCULATOR -->
-  <section id="calculadora">
-    <div class="wrap">
-      <div class="label">// Retorno Sobre Alavancagem</div>
-      <h2>Calcule quanto tempo e receita você recupera ao operar pipelines.</h2>
-      <p class="sectionLead">Digitar prompts manualmente consome semanas de trabalho cognitivo de alto valor. Veja o impacto de trocar a digitação por sistemas autônomos governados.</p>
-
-      <div class="calc-card fadein">
-        <div class="calc-slider-wrap">
-          <div style="display:flex; justify-content:space-between; align-items:center;">
-            <label style="font-weight:700; font-size:15px;">Horas semanais em chats de IA hoje:</label>
-            <span class="mono" id="sliderValDisplay" style="color:var(--lime); font-size:18px; font-weight:700;">15h / semana</span>
+    <!-- ===== FAQ ===== -->
+    <section style="border-top:1px solid var(--line)">
+      <div class="wrap">
+        <span class="k">Dúvidas</span>
+        <h2>Perguntas frequentes</h2>
+        <div class="faq">
+          <div class="faq-item open">
+            <div class="faq-q">O que é o Modo Operador? <i>+</i></div>
+            <div class="faq-a"><p>É um mapa de operação para arquitetos e engenheiros que querem construir sistemas autônomos com IA, não apenas consumir APIs. Inclui 7 capítulos práticos, código e áudios.</p></div>
           </div>
-          <input type="range" class="calc-slider" id="hourSlider" min="5" max="40" value="15" oninput="updateCalculator(this.value)">
-          <p style="font-size:13px; color:var(--muted); line-height:1.6;">Inclui copiar e colar código, re-explicar contexto, corrigir alucinações e executar testes manuais.</p>
-        </div>
-
-        <div class="calc-metric-box">
-          <div class="calc-big-num" id="calcSavedHours">48h</div>
-          <div style="font-size:14px; font-weight:700; color:#fff; margin-bottom:4px;">Horas Recuperadas por Mês</div>
-          <div style="font-size:12.5px; color:var(--muted);">Equivalente a <strong style="color:var(--lime)" id="calcMultiple">6.4x</strong> de amplificação na sua capacidade de entrega sem contratar ninguém.</div>
-        </div>
-      </div>
-    </div>
-  </section>
-
-  <!-- WHAT'S INCLUDED -->
-  <section id="conteudo">
-    <div class="wrap">
-      <div class="label">// O Que Está Incluído na Formação</div>
-      <h2>Acesso completo à plataforma de formação e aos ativos de engenharia.</h2>
-      <p class="sectionLead">Você não recebe vídeos teóricos genéricos. Recebe o Manual Técnico Exaustivo em texto (+130KB de engenharia e código), acompanhado por masterclasses em áudio de estúdio e o arsenal open source.</p>
-
-      <div class="bento">
-        <article class="card c4 fadein">
-          <div class="cardTag">MANUAL TÉCNICO COMPLETO EM TEXTO</div>
-          <h3>7 Capítulos Densos de Engenharia</h3>
-          <p>Mais de 130KB de texto técnico aprofundado com código real em Python/TypeScript, diagramas arquiteturais, specs completas e guardrails.</p>
-        </article>
-
-        <article class="card c4 fadein">
-          <div class="cardTag">MASTERCLASSES EM ÁUDIO HD</div>
-          <h3>+3 Horas de Áudios de Estúdio</h3>
-          <p>6 aulas em áudio de alta fidelidade para ouvir enquanto programa, caminha ou analisa código. Player contínuo integrado sem interrupção.</p>
-        </article>
-
-        <article class="card c4 fadein">
-          <div class="cardTag">ARSENAL GITHUB</div>
-          <h3>Acesso aos +10 Repos Open Source</h3>
-          <p>Aprenda a operar, clonar e estender mcp-forge, operator-nexus, operator-gateway, run-ledger, cyber-sentinel e todo o ecossistema público.</p>
-        </article>
-
-        <article class="card c4 fadein">
-          <div class="cardTag">CATÁLOGO COMPLETO</div>
-          <h3>Arsenal Open Source com 20 Módulos de Engenharia</h3>
-          <p>O acervo completo de contratos operacionais numerados de 00 a 100 para consulta, cópia de diretrizes e implementação direta.</p>
-        </article>
-
-        <article class="card c4 fadein">
-          <div class="cardTag">LABORATÓRIO INTERATIVO</div>
-          <h3>Live Spec Builder & Quiz</h3>
-          <p>Gerador interativo de specs de 7 campos e ferramenta de diagnóstico de maturidade com pontuação instantânea e plano de ação.</p>
-        </article>
-
-        <article class="card c4 fadein">
-          <div class="cardTag">ACESSO VITALÍCIO</div>
-          <h3>Evolução Contínua</h3>
-          <p>O produto acompanha a evolução dos modelos e ferramentas. Você tem acesso perpétuo às novas atualizações sem mensalidades.</p>
-        </article>
-      </div>
-    </div>
-  </section>
-
-  <!-- OFFER SECTION -->
-  <section id="acesso">
-    <div class="wrap">
-      <div class="offer fadein">
-        <div>
-          <div class="label">// Acesso Imediato & Vitalício</div>
-          <h2>Opere sistemas de IA como um profissional de elite.</h2>
-          <p class="sectionLead" style="margin-bottom:20px;">Junte-se à comunidade de operadores que eliminou a digitação manual de prompts e construiu pipelines soberanos que geram receita real.</p>
-          
-          <ul>
-            <li>Acesso vitalício ao Manual Técnico Completo em Texto (+130KB)</li>
-            <li>As 6 Masterclasses em Áudio de Estúdio (+3h de conteúdo HD)</li>
-            <li>O Arsenal completo de mais de 10 Projetos Open Source no GitHub</li>
-            <li>O Catálogo Completo dos 20 Módulos do Arsenal Open Source</li>
-            <li>Templates prontos: .operator/context.md, ledger.jsonl, run_plan.json</li>
-            <li>Garantia incondicional de 7 dias com devolução integral</li>
-          </ul>
-        </div>
-
-        <form class="form" id="waitlist" novalidate>
-          <input type="hidden" name="_subject" value="Modo Operador — Inscrição na Formação">
-          <input type="text" name="_gotcha" tabindex="-1" autocomplete="off" style="position:absolute;left:-9999px">
-          
-          <label for="name">Seu Nome Completo</label>
-          <input id="name" name="name" type="text" required placeholder="Digite seu nome">
-
-          <label for="email">Seu Melhor E-mail</label>
-          <input id="email" name="email" type="email" required placeholder="seuemail@exemplo.com">
-
-          <label for="stack">Qual é a sua stack ou objetivo principal?</label>
-          <input id="stack" name="stack" placeholder="ex: Prestar serviços de IA, Cursor, Python, n8n...">
-
-          <button class="btn" type="submit">Garantir Meu Acesso Agora →</button>
-          
-          <div class="message" id="message"></div>
-          <p style="font-size:11px; color:var(--dim); margin-top:14px; text-align:center;">
-            🔒 Acesso imediato à plataforma. Dados 100% seguros. Sem spam.
-          </p>
-        </form>
-      </div>
-    </div>
-  </section>
-
-  <!-- FAQ SECTION -->
-  <section>
-    <div class="wrap">
-      <div class="label">// Dúvidas Frequentes</div>
-      <h2>Perguntas frequentes de quem pensa como engenheiro.</h2>
-      <p class="sectionLead">Respostas diretas e sem rodeios para as perguntas mais comuns.</p>
-
-      <div class="faq-grid">
-        <div class="faq-item" onclick="toggleFaq(this)">
-          <div class="faq-q">
-            <span>Preciso ser um programador sênior para aplicar?</span>
-            <span class="faq-icon">+</span>
+          <div class="faq-item">
+            <div class="faq-q">Preciso de experiência prévia? <i>+</i></div>
+            <div class="faq-a"><p>Conhecimento básico de Python e APIs ajuda, mas os capítulos são progressivos. Do zero ao operador em 7 passos.</p></div>
           </div>
-          <div class="faq-a">
-            Não. O Modo Operador ensina arquitetura de sistemas e governança. Se você já tem noções de scripts básicos em Python ou TypeScript, mexe no terminal ou orquestra no Cursor/Claude, você conseguirá implementar 100% do conteúdo. Os repositórios fornecidos já vêm com código inicial testado e documentado.
+          <div class="faq-item">
+            <div class="faq-q">É um curso ou uma comunidade? <i>+</i></div>
+            <div class="faq-a"><p>É um produto educacional com material gravado, mas inclui acesso à comunidade de operadores para troca de experiências e suporte.</p></div>
           </div>
-        </div>
-
-        <div class="faq-item" onclick="toggleFaq(this)">
-          <div class="faq-q">
-            <span>Como posso gerar receita com os repositórios open source?</span>
-            <span class="faq-icon">+</span>
-          </div>
-          <div class="faq-a">
-            Você aprende a usar as ferramentas open source (mcp-forge, operator-nexus, operator-gateway) para prestar serviços de automação e implantação de agentes para empresas (tickets de R$ 5k a R$ 25k), criar seus próprios micro-produtos autônomos ou implantar infraestrutura de IA privada e local.
-          </div>
-        </div>
-
-        <div class="faq-item" onclick="toggleFaq(this)">
-          <div class="faq-q">
-            <span>Serve para quem usa Claude Desktop, Cursor, ChatGPT ou Antigravity?</span>
-            <span class="faq-icon">+</span>
-          </div>
-          <div class="faq-a">
-            Sim. O protocolo Model Context Protocol (MCP) e as diretrizes de Spec Operacional de 7 campos são agnósticos de modelo e editor. Você pode usar Claude 3.7, Gemini 2.5, GPT-4o ou modelos locais no Ollama. A força do sistema está na arquitetura de controle e persistência, não na interface de chat.
-          </div>
-        </div>
-
-        <div class="faq-item" onclick="toggleFaq(this)">
-          <div class="faq-q">
-            <span>Qual a diferença para cursos e bootcamps tradicionais de IA?</span>
-            <span class="faq-icon">+</span>
-          </div>
-          <div class="faq-a">
-            99% dos cursos ensinam "técnicas de prompt" para você continuar sendo o digitador manual na frente de uma caixa de texto. O Modo Operador ensina engenharia de controle: pipelines autônomos, gates de segurança, Decision Ledgers imutáveis e código de produção auditável no GitHub.
-          </div>
-        </div>
-
-        <div class="faq-item" onclick="toggleFaq(this)">
-          <div class="faq-q">
-            <span>Como tenho acesso ao texto e aos áudios?</span>
-            <span class="faq-icon">+</span>
-          </div>
-          <div class="faq-a">
-            O acesso é liberado imediatamente na área de membros interativa. Você pode ler os 7 capítulos exaustivos em texto, ouvir os áudios diretamente no player fixo da plataforma ou baixar para ouvir offline, além de copiar os templates com 1 clique.
+          <div class="faq-item">
+            <div class="faq-q">Como acesso os áudios e códigos? <i>+</i></div>
+            <div class="faq-a"><p>Após a compra, você recebe acesso a uma plataforma privada com todos os capítulos, materiais e repositórios.</p></div>
           </div>
         </div>
       </div>
-    </div>
-  </section>
-</main>
+    </section>
 
-<!-- FOOTER -->
-<footer>
-  <div class="wrap">
-    <div>
-      <span style="font-weight:700; color:#fff;">Modo Operador</span> · Ecossistema Open Source Modo Operador
-    </div>
-    <div class="mono" style="color:var(--lime);">
-      PROOF &gt; PROMISES · GITHUB.COM/MODO-OPERADOR
+  </main>
+
+  <!-- ===== MARQUEE ===== -->
+  <div class="mq">
+    <div class="mq-t">
+      <span>BENNI OS 7.0</span> <em>●</em> <span>opere, não use</span> <em>●</em> <span>runtime autônomo</span> <em>●</em> <span>MCP nativo</span> <em>●</em>
+      <span>BENNI OS 7.0</span> <em>●</em> <span>opere, não use</span> <em>●</em> <span>runtime autônomo</span> <em>●</em> <span>MCP nativo</span> <em>●</em>
+      <span>BENNI OS 7.0</span> <em>●</em> <span>opere, não use</span> <em>●</em> <span>runtime autônomo</span> <em>●</em> <span>MCP nativo</span> <em>●</em>
     </div>
   </div>
-</footer>
 
-<!-- THREE.JS 3D OPERATOR CORE SCRIPT -->
-<script type="module">
-(async () => {
-  const box = document.getElementById('coreBox');
-  const canvas = document.getElementById('core');
-  if (!box || !canvas) return;
+  <!-- ===== FINAL CTA ===== -->
+  <section class="final">
+    <div class="wrap">
+      <span class="k">Pronto para operar?</span>
+      <h2>O sistema espera <em>você.</em></h2>
+      <p class="sub">Junte-se aos que já abandonaram o papel de usuário e assumiram o controle do runtime.</p>
+      <a href="#pricing" class="btn btn-p" style="margin-top:0.5rem">Quero meu acesso — R$147</a>
+    </div>
+  </section>
 
-  function hasWebGL() {
-    try {
-      const test = document.createElement('canvas');
-      return !!(window.WebGLRenderingContext && (test.getContext('webgl2') || test.getContext('webgl')));
-    } catch(e) { return false; }
-  }
-  if (!hasWebGL()) return;
+  <footer>
+    <span>© 2026 Benni OS — Modo Operador v7.0</span>
+    <span>
+      <a href="#">Termos</a> · <a href="#">Política</a> · <a href="mailto:oi@benni-os.net">oi@benni-os.net</a>
+    </span>
+  </footer>
 
-  try {
-    const THREE = await import('https://cdn.jsdelivr.net/npm/three@0.160.1/build/three.module.js');
+  <script>
+    (function() {
+      "use strict";
 
-    const r = new THREE.WebGLRenderer({ canvas, alpha: true, antialias: true });
-    const scene = new THREE.Scene();
-    const camera = new THREE.PerspectiveCamera(38, 1, 0.1, 100);
-    camera.position.set(0, 0, 8.2);
+      // ============================================================
+      // 1. BOOT
+      // ============================================================
+      const boot = document.getElementById('boot');
+      const bar = document.getElementById('bootBar');
+      const pct = document.getElementById('bootPct');
+      const log = document.getElementById('bootLog');
+      const msgs = [
+        '⏳ carregando kernel...',
+        '🔌 conectando ao runtime...',
+        '🧠 inicializando memória do agente...',
+        '⚡ ativando MCP bridges...',
+        '🔗 sincronizando repositórios...',
+        '✅ sistema operacional. pronto.'
+      ];
+      let idx = 0;
+      let progress = 0;
 
-    const group = new THREE.Group();
-    scene.add(group);
+      function updateLog() {
+        if (idx < msgs.length) {
+          log.innerHTML += msgs[idx] + '\n';
+          idx++;
+        }
+      }
 
-    // Physical glowing core
-    const core = new THREE.Mesh(
-      new THREE.IcosahedronGeometry(1.48, 4),
-      new THREE.MeshPhysicalMaterial({
-        color: 0x121a10,
-        metalness: 0.8,
-        roughness: 0.2,
-        transmission: 0.15,
-        thickness: 1.4,
-        emissive: 0x1b350a,
-        emissiveIntensity: 0.8
-      })
-    );
-    group.add(core);
+      const interval = setInterval(() => {
+        progress += Math.random() * 6 + 2;
+        if (progress >= 100) {
+          progress = 100;
+          clearInterval(interval);
+          boot.classList.add('hidden');
+          initReveal();
+          initCursor();
+          initFaq();
+          return;
+        }
+        bar.style.width = progress + '%';
+        pct.textContent = Math.min(100, Math.floor(progress));
+        if (progress > 20 && idx === 1) updateLog();
+        if (progress > 45 && idx === 2) updateLog();
+        if (progress > 70 && idx === 3) updateLog();
+        if (progress > 88 && idx === 4) updateLog();
+      }, 280);
 
-    // Exterior wireframe
-    const wire = new THREE.Mesh(
-      new THREE.IcosahedronGeometry(1.62, 3),
-      new THREE.MeshBasicMaterial({ color: 0xccff46, wireframe: true, transparent: true, opacity: 0.18 })
-    );
-    group.add(wire);
+      setTimeout(() => {
+        if (!boot.classList.contains('hidden')) {
+          progress = 100;
+          bar.style.width = '100%';
+          pct.textContent = '100';
+          boot.classList.add('hidden');
+          initReveal();
+          initCursor();
+          initFaq();
+        }
+      }, 7000);
 
-    // Orbiting rings
-    const rings = [];
-    for (let i = 0; i < 3; i++) {
-      const ring = new THREE.Mesh(
-        new THREE.TorusGeometry(2.15 + i * 0.35, 0.016, 12, 140),
-        new THREE.MeshBasicMaterial({
-          color: i === 1 ? 0x80eaff : (i === 2 ? 0xa78bfa : 0xccff46),
-          transparent: true,
-          opacity: 0.6
-        })
-      );
-      ring.rotation.set(i * 0.85, i * 0.55, i * 0.35);
-      group.add(ring);
-      rings.push(ring);
-    }
+      // ============================================================
+      // 2. SCROLL REVEAL
+      // ============================================================
+      function initReveal() {
+        const els = document.querySelectorAll('.reveal');
+        if (!els.length) return;
+        const observer = new IntersectionObserver((entries) => {
+          entries.forEach(entry => {
+            if (entry.isIntersecting) {
+              entry.target.classList.add('visible');
+              observer.unobserve(entry.target);
+            }
+          });
+        }, { threshold: 0.15, rootMargin: '0px 0px -30px 0px' });
+        els.forEach(el => observer.observe(el));
+      }
 
-    // Particle Cloud
-    const points = [];
-    for (let i = 0; i < 600; i++) {
-      const a = Math.random() * Math.PI * 2;
-      const z = (Math.random() - 0.5) * 6;
-      const rad = 2.8 + Math.random() * 2.8;
-      points.push(Math.cos(a) * rad, z, Math.sin(a) * rad);
-    }
-    const pg = new THREE.BufferGeometry();
-    pg.setAttribute('position', new THREE.Float32BufferAttribute(points, 3));
-    scene.add(new THREE.Points(pg, new THREE.PointsMaterial({
-      size: 0.025,
-      color: 0x80eaff,
-      transparent: true,
-      opacity: 0.55
-    })));
+      // ============================================================
+      // 3. CURSOR PERSONALIZADO
+      // ============================================================
+      function initCursor() {
+        const cur = document.querySelector('.cur');
+        const dot = document.querySelector('.cur-dot');
+        if (!cur || !dot) return;
+        if (window.matchMedia('(hover: none)').matches) return;
 
-    // Lights
-    scene.add(new THREE.AmbientLight(0xffffff, 0.6));
-    const pointLight = new THREE.PointLight(0xccff46, 18, 16);
-    pointLight.position.set(2, 2, 4);
-    scene.add(pointLight);
+        let x = 0, y = 0, tx = 0, ty = 0;
+        const update = () => {
+          x += (tx - x) * 0.12;
+          y += (ty - y) * 0.12;
+          cur.style.transform = `translate(${x - 17}px, ${y - 17}px)`;
+          dot.style.transform = `translate(${tx - 2}px, ${ty - 2}px)`;
+          requestAnimationFrame(update);
+        };
 
-    const cyanLight = new THREE.PointLight(0x80eaff, 12, 16);
-    cyanLight.position.set(-3, -2, 2);
-    scene.add(cyanLight);
-
-    const mouse = { x: 0, y: 0 };
-    canvas.addEventListener('pointermove', e => {
-      const b = canvas.getBoundingClientRect();
-      mouse.x = (e.clientX - b.left) / b.width - 0.5;
-      mouse.y = (e.clientY - b.top) / b.height - 0.5;
-    });
-
-    function resize() {
-      const b = canvas.getBoundingClientRect();
-      if (b.width === 0 || b.height === 0) return;
-      r.setPixelRatio(Math.min(devicePixelRatio, 2));
-      r.setSize(b.width, b.height, false);
-      camera.aspect = b.width / b.height;
-      camera.updateProjectionMatrix();
-    }
-    addEventListener('resize', resize);
-    resize();
-
-    function loop() {
-      requestAnimationFrame(loop);
-      group.rotation.y += 0.003;
-      group.rotation.x += (mouse.y * 0.35 - group.rotation.x) * 0.035;
-      group.rotation.z += (mouse.x * 0.25 - group.rotation.z) * 0.035;
-      core.rotation.y -= 0.004;
-      wire.rotation.x += 0.002;
-      rings.forEach((x, i) => x.rotation.z += (i + 1) * 0.0035);
-      r.render(scene, camera);
-    }
-    loop();
-
-    box.classList.add('has-3d');
-  } catch (err) {
-    console.warn('Operator Core 3D fallback ativo.', err);
-  }
-})();
-</script>
-
-<script>
-// ── REVEAL CHOREOGRAPHY ──
-(function(){
-  const els = document.querySelectorAll('.fadein');
-  function revealAll() { els.forEach(x => x.classList.add('in')); }
-  try {
-    if ('IntersectionObserver' in window) {
-      const io = new IntersectionObserver((entries) => {
-        entries.forEach(entry => {
-          if (entry.isIntersecting) entry.target.classList.add('in');
+        document.addEventListener('mousemove', (e) => {
+          tx = e.clientX;
+          ty = e.clientY;
+          const target = e.target.closest('a, button, .faq-q, audio');
+          if (target) cur.classList.add('on');
+          else cur.classList.remove('on');
         });
-      }, { threshold: 0.1 });
-      els.forEach(x => io.observe(x));
-    } else {
-      revealAll();
-    }
-  } catch(e) { revealAll(); }
-  setTimeout(revealAll, 2000);
-})();
+        update();
+      }
 
-// ── LANDING TERMINAL LOGIC ──
-const landingTerm = document.getElementById('landingTermOutput');
-function appendLandingTerm(txt, color = "#c7cde2") {
-  const d = document.createElement('div');
-  d.style.color = color;
-  d.innerHTML = txt;
-  landingTerm.appendChild(d);
-  landingTerm.scrollTop = landingTerm.scrollHeight;
-}
+      // ============================================================
+      // 4. FAQ ACCORDION
+      // ============================================================
+      function initFaq() {
+        document.querySelectorAll('.faq-q').forEach(q => {
+          q.addEventListener('click', function() {
+            const item = this.closest('.faq-item');
+            if (!item) return;
+            item.classList.toggle('open');
+          });
+        });
+      }
 
-function runLandingCmd(cmd) {
-  appendLandingTerm(`<span style="color:var(--lime)">operator@local:~$</span> operator ${cmd}`);
-  if (cmd === 'status') {
-    appendLandingTerm("[OK] Modo Operador Gateway: ONLINE (127.0.0.1:3000)");
-    appendLandingTerm("  - Reality Lock Protocol: ENFORCED");
-    appendLandingTerm("  - Gate Policy: DEFAULT-DENY ON EXTERNAL WRITES");
-    appendLandingTerm("  - Ecosystem: +10 Open Source Repositories Connected");
-  } else if (cmd.includes('repos')) {
-    appendLandingTerm("[REPOSITORIES] 10+ repositórios auditáveis no GitHub (github.com/modo-operador):");
-    appendLandingTerm("  1. mcp-forge (FastMCP Python)");
-    appendLandingTerm("  2. operator-nexus (Hybrid LLM Router)");
-    appendLandingTerm("  3. operator-gateway (Approval Gates)");
-    appendLandingTerm("  4. agent-run-ledger (Run Ledger 90c)");
-    appendLandingTerm("  5. agent-cyber-sentinel (Tier-0 Security)");
-    appendLandingTerm("  6. agent-memory-mesh (Context Graphs)");
-    appendLandingTerm("  7. agent-browser-mesh (Playwright Mesh)");
-    appendLandingTerm("  8. agent-intent-compiler (Spec Compiler)");
-    appendLandingTerm("  9. agent-code-sandbox (Execution Sandbox)");
-    appendLandingTerm(" 10. reality-lock (Evidence Ledger)");
-    appendLandingTerm("  Status de integridade: 100% AUDITED");
-  } else if (cmd === 'skills' || cmd === 'modules') {
-    appendLandingTerm("[MODULES] 20 módulos operacionais abertos registrados no catálogo:");
-    appendLandingTerm("  mcp-forge, operator-nexus, operator-gateway, run-ledger, cyber-sentinel...");
-    appendLandingTerm("  Hashes SHA256 verificados: 100% GREEN");
-  } else if (cmd.includes('gate')) {
-    appendLandingTerm("[GATE EVALUATION]");
-    appendLandingTerm("  Target: 'git push origin main'");
-    appendLandingTerm("  Status: <span style='color:var(--amber)'>BLOCKED (Awaiting HUMAN_GO token)</span>");
-    appendLandingTerm("  Proteção ativa contra deploys acidentais.");
-  } else if (cmd === 'clear') {
-    landingTerm.innerHTML = "";
-  }
-}
+      // ============================================================
+      // 5. MOBILE: fallback para canvas
+      // ============================================================
+      function handleCanvas() {
+        const canvas = document.getElementById('webgl');
+        if (!canvas) return;
+        if (window.innerWidth < 768) {
+          canvas.style.display = 'none';
+        } else {
+          canvas.style.display = 'block';
+        }
+      }
+      window.addEventListener('resize', handleCanvas);
+      handleCanvas();
 
-// ── CALCULATOR ──
-function updateCalculator(hours) {
-  document.getElementById('sliderValDisplay').textContent = `${hours}h / semana`;
-  const monthlySaved = Math.round(hours * 3.2); // ~80% saved
-  document.getElementById('calcSavedHours').textContent = `${monthlySaved}h`;
-  const mult = (1 + (hours / 40) * 8).toFixed(1);
-  document.getElementById('calcMultiple').textContent = `${mult}x`;
-}
+      // ============================================================
+      // 6. SPOTLIGHT SEGUE (desktop)
+      // ============================================================
+      if (window.matchMedia('(hover: hover)').matches) {
+        document.addEventListener('mousemove', (e) => {
+          document.documentElement.style.setProperty('--mx', e.clientX + 'px');
+          document.documentElement.style.setProperty('--my', e.clientY + 'px');
+        });
+      }
 
-// ── FAQ TOGGLE ──
-function toggleFaq(el) {
-  const isActive = el.classList.contains('active');
-  document.querySelectorAll('.faq-item').forEach(f => f.classList.remove('active'));
-  if (!isActive) el.classList.add('active');
-}
-
-// ── FORMSPREE WAITLIST / ACCESS ──
-const FORM_ENDPOINT = "https://formspree.io/f/mjgnwpqw";
-const form = document.getElementById('waitlist'), msg = document.getElementById('message');
-
-form.addEventListener('submit', async (e) => {
-  e.preventDefault();
-  const btn = form.querySelector('button');
-  btn.disabled = true;
-  btn.textContent = 'Processando Inscrição...';
-
-  try {
-    const res = await fetch(FORM_ENDPOINT, {
-      method: 'POST',
-      body: new FormData(form),
-      headers: { 'Accept': 'application/json' }
-    });
-    if (!res.ok) throw new Error('Falha no envio');
-    form.reset();
-    msg.className = 'message ok';
-    msg.textContent = '✓ Inscrição confirmada com sucesso! Os detalhes de acesso foram enviados para o seu e-mail.';
-  } catch (err) {
-    msg.className = 'message err';
-    msg.textContent = 'Não foi possível completar o envio no momento. Por favor, tente novamente ou verifique os dados informados.';
-  } finally {
-    btn.disabled = false;
-    btn.textContent = 'Garantir Meu Acesso Agora →';
-  }
-});
-</script>
+      console.log('🔧 Modo Operador v7.0 carregado com capítulos inéditos e painel de templates');
+    })();
+  </script>
 </body>
 </html>
