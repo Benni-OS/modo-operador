@@ -19,6 +19,9 @@
 
 <img src="https://raw.githubusercontent.com/andreasbm/readme/master/assets/lines/rainbow.png" width="100%"/>
 
+
+<img src="assets/demo.gif" alt="Modo Operador Animated Architecture Demo" width="100%"/>
+
 </div>
 
 <br/>
