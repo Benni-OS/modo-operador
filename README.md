@@ -179,13 +179,29 @@ O Modo Operador é uma iniciativa orientada à comunidade técnica de língua po
 - Adquira a formação completa: [Acesse o Checkout Oficial](https://pay.cakto.com.br/pfuibmt_999515)
 
 <br/>
+---
+
+## 🏛️ Arquitetura Comercial & Autoridade
+
+Precisa de orquestração multiagente soberana, engenharia de interfaces ou infraestrutura corporativa de IA?
+
+- **Site Oficial:** [https://benni-os.net](https://benni-os.net)
+- **Modo Operador (Academia):** [https://benni-os.net/blog/academy.html](https://benni-os.net/blog/academy.html)
+- **Organização GitHub:** [https://github.com/Benni-OS](https://github.com/Benni-OS)
+- **Autor & Mantenedor:** [Benni Alencar](https://github.com/BenniAlencar)
+
+---
+
+## 📄 Licença & Proveniência
+
+- **Licença:** [Licença MIT](LICENSE)
+- **Autor:** Benni Alencar (`bennialencar@benni-os.net`)
+- **Arquitetura:** Benni Master OS v9.4 — Padrão de Governança Tier-0
 
 <div align="center">
 
-<img src="https://capsule-render.vercel.app/api?type=waving&color=0:00C853,50:FFB224,100:0A0A09&height=120&section=footer" width="100%"/>
+<img src="https://capsule-render.vercel.app/api?type=waving&color=0:7000FF,50:1a1a2e,100:0D0D0D&height=120&section=footer" width="100%"/>
 
-**Modo Operador** — *Construído para quem opera sistemas, não para quem coleciona prompts.*
-
-© 2026 Modo Operador. Código sob licença MIT. Todos os direitos reservados aos materiais didáticos da formação.
+**Modo Operador** — *Sovereign AI Systems Engineering Portal & Operator Curriculum* • [benni-os.net](https://benni-os.net) • `MIT License`
 
 </div>
