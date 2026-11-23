@@ -1,6 +1,6 @@
 <div align="center">
 
-<img src="https://capsule-render.vercel.app/api?type=waving&color=0:0A0A09,50:FFB224,100:00C853&height=200&section=header&text=Modo%20Operador&fontSize=62&fontColor=ffffff&fontAlignY=38&desc=Manual%20T%C3%A9cnico%20de%20Engenharia%20de%20Agentes%20e%20Sistemas%20Soberanos&descAlignY=58&descSize=14&animation=fadeIn" width="100%"/>
+<img src="assets/banner_header.png" width="100%"/>
 
 <br/>
 
@@ -200,7 +200,7 @@ Precisa de orquestração multiagente soberana, engenharia de interfaces ou infr
 
 <div align="center">
 
-<img src="https://capsule-render.vercel.app/api?type=waving&color=0:7000FF,50:1a1a2e,100:0D0D0D&height=120&section=footer" width="100%"/>
+<img src="assets/banner_footer.png" width="100%"/>
 
 **Modo Operador** — *Sovereign AI Systems Engineering Portal & Operator Curriculum* • [benni-os.net](https://benni-os.net) • `MIT License`
 
